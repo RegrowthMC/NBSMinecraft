@@ -1,1 +1,5 @@
-rootProject.name = "ProjectName"
+rootProject.name = "NBSJava"
+
+include("bukkit")
+include("common")
+include("packetevents")

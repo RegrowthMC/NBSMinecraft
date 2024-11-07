@@ -7,51 +7,40 @@ plugins {
 group = "org.lushplugins"
 version = "1.0.0"
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-    maven("https://oss.sonatype.org/content/groups/public/")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
-}
+allprojects {
+    apply(plugin="java-library")
+    apply(plugin="io.github.goooler.shadow")
 
-dependencies {
-    // Dependencies
-    compileOnly("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
+    group = rootProject.group
+    version = rootProject.version
 
-    // Soft Dependencies
-
-    // Libraries
-}
-
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-
-    registerFeature("optional") {
-        usingSourceSet(sourceSets["main"])
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven("https://oss.sonatype.org/content/groups/public/")
+        maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
+        maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
+        maven("https://jitpack.io/") // NBS4j
     }
 
-    withSourcesJar()
-}
-
-tasks {
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
+    dependencies {
+        // Annotations
+        compileOnlyApi("org.jetbrains:annotations:26.0.1")
     }
 
-    shadowJar {
-        minimize()
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 
-        archiveFileName.set("${project.name}-${project.version}.jar")
-    }
-
-    processResources{
-        filesMatching("plugin.yml") {
-            expand(project.properties)
+        registerFeature("optional") {
+            usingSourceSet(sourceSets["main"])
         }
 
-        inputs.property("version", rootProject.version)
-        filesMatching("plugin.yml") {
-            expand("version" to rootProject.version)
+        withSourcesJar()
+    }
+
+    tasks {
+        withType<JavaCompile> {
+            options.encoding = "UTF-8"
         }
     }
 }
