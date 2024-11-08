@@ -7,8 +7,9 @@ plugins {
 group = "org.lushplugins"
 version = "1.0.0"
 
-allprojects {
+subprojects {
     apply(plugin="java-library")
+    apply(plugin="maven-publish")
     apply(plugin="io.github.goooler.shadow")
 
     group = rootProject.group
@@ -43,37 +44,37 @@ allprojects {
             options.encoding = "UTF-8"
         }
     }
-}
 
-publishing {
-    repositories {
-        maven {
-            name = "lushReleases"
-            url = uri("https://repo.lushplugins.org/releases")
-            credentials(PasswordCredentials::class)
-            authentication {
-                isAllowInsecureProtocol = true
-                create<BasicAuthentication>("basic")
+    publishing {
+        repositories {
+            maven {
+                name = "lushReleases"
+                url = uri("https://repo.lushplugins.org/releases")
+                credentials(PasswordCredentials::class)
+                authentication {
+                    isAllowInsecureProtocol = true
+                    create<BasicAuthentication>("basic")
+                }
+            }
+
+            maven {
+                name = "lushSnapshots"
+                url = uri("https://repo.lushplugins.org/snapshots")
+                credentials(PasswordCredentials::class)
+                authentication {
+                    isAllowInsecureProtocol = true
+                    create<BasicAuthentication>("basic")
+                }
             }
         }
 
-        maven {
-            name = "lushSnapshots"
-            url = uri("https://repo.lushplugins.org/snapshots")
-            credentials(PasswordCredentials::class)
-            authentication {
-                isAllowInsecureProtocol = true
-                create<BasicAuthentication>("basic")
+        publications {
+            create<MavenPublication>("maven") {
+                groupId = rootProject.group.toString() + ".nbsjava"
+                artifactId = rootProject.name + "-" + project.name
+                version = rootProject.version.toString()
+                from(project.components["java"])
             }
-        }
-    }
-
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = rootProject.group.toString()
-            artifactId = rootProject.name
-            version = rootProject.version.toString()
-            from(project.components["java"])
         }
     }
 }
