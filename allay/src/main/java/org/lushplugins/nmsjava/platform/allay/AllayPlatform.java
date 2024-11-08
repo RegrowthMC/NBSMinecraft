@@ -34,6 +34,8 @@ public class AllayPlatform extends AbstractPlatform {
             return;
         }
 
+        // TODO: get entity here
+
         Vector3fc vector = player.getLocation();
         Vector3f position = Vector3f.from(vector.x(), vector.y(), vector.z());
 
