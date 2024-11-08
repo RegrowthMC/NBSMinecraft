@@ -12,13 +12,20 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSoundEffect;
 import org.lushplugins.nbsjava.platform.AbstractPlatform;
 import org.lushplugins.nbsjava.platform.bukkit.utils.PacketEventsConverter;
+import org.lushplugins.nbsjava.utils.AudioListener;
+import org.lushplugins.nbsjava.utils.EntityReference;
 import org.lushplugins.nbsjava.utils.SoundLocation;
 
 public class PacketEventsPlatform extends AbstractPlatform {
 
     @Override
-    public void playSound(int viewerId, String sound, org.lushplugins.nbsjava.utils.SoundCategory category, float volume, float pitch) {
-        User user = getUser(viewerId);
+    public void playSound(AudioListener listener, String sound, org.lushplugins.nbsjava.utils.SoundCategory category, float volume, float pitch) {
+        playSound(listener, listener, sound, category, volume, pitch);
+    }
+
+    @Override
+    public void playSound(AudioListener listener, EntityReference entityReference, String sound, org.lushplugins.nbsjava.utils.SoundCategory category, float volume, float pitch) {
+        User user = getUser(listener);
         if (user == null) {
             return;
         }
@@ -26,13 +33,13 @@ public class PacketEventsPlatform extends AbstractPlatform {
         Sound peSound = new StaticSound(new ResourceLocation(ResourceLocation.normString(sound)), null);
         SoundCategory peCategory = PacketEventsConverter.convert(category);
 
-        PacketWrapper<?> packet = new WrapperPlayServerEntitySoundEffect(peSound, peCategory, user.getEntityId(), volume, pitch);
+        PacketWrapper<?> packet = new WrapperPlayServerEntitySoundEffect(peSound, peCategory, entityReference.entityId(), volume, pitch);
         user.sendPacket(packet);
     }
 
     @Override
-    public void playSound(int viewerId, SoundLocation location, String sound, org.lushplugins.nbsjava.utils.SoundCategory category, float volume, float pitch) {
-        User user = getUser(viewerId);
+    public void playSound(AudioListener listener, SoundLocation location, String sound, org.lushplugins.nbsjava.utils.SoundCategory category, float volume, float pitch) {
+        User user = getUser(listener);
         if (user == null) {
             return;
         }
@@ -45,9 +52,9 @@ public class PacketEventsPlatform extends AbstractPlatform {
         user.sendPacket(packet);
     }
 
-    private User getUser(int entityId) {
+    private User getUser(AudioListener listener) {
         return PacketEvents.getAPI().getProtocolManager().getUsers().stream()
-            .filter(user -> user.getEntityId() != entityId)
+            .filter(user -> user.getEntityId() == listener.entityId() && user.getUUID() == listener.uuid())
             .findFirst()
             .orElse(null);
     }
