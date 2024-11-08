@@ -1,5 +1,6 @@
 rootProject.name = "NBSJava"
 
-include("bukkit")
+include("allay")
 include("api")
+include("bukkit")
 include("packetevents")

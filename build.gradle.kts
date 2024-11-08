@@ -21,7 +21,10 @@ subprojects {
         maven("https://oss.sonatype.org/content/groups/public/")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
         maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
-        maven("https://jitpack.io/") // NBS4j
+        maven("https://repo.opencollab.dev/maven-releases/") // Allay
+        maven("https://repo.opencollab.dev/maven-snapshots/") // Allay
+        maven("https://storehouse.okaeri.eu/repository/maven-public/") // Allay
+        maven("https://jitpack.io/") // NBS4j, Allay
     }
 
     dependencies {
