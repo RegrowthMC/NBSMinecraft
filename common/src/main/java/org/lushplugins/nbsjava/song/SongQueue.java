@@ -9,6 +9,16 @@ public class SongQueue {
     private final Deque<Song> queue = new ArrayDeque<>();
     private boolean loop;
 
+    public SongQueue() {}
+
+    public SongQueue(Song song) {
+        queueSong(song);
+    }
+
+    public SongQueue(Playlist playlist) {
+        queuePlaylist(playlist);
+    }
+
     /**
      * Queue a song to be played
      * @param song song to queue

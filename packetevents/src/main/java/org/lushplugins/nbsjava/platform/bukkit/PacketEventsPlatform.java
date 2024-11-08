@@ -14,13 +14,11 @@ import org.lushplugins.nbsjava.platform.AbstractPlatform;
 import org.lushplugins.nbsjava.platform.bukkit.utils.PacketEventsConverter;
 import org.lushplugins.nbsjava.utils.SoundLocation;
 
-import java.util.UUID;
-
 public class PacketEventsPlatform extends AbstractPlatform {
 
     @Override
-    public void playSound(UUID entityUUID, String sound, org.lushplugins.nbsjava.utils.SoundCategory category, float volume, float pitch) {
-        User user = getUser(entityUUID);
+    public void playSound(int viewerId, String sound, org.lushplugins.nbsjava.utils.SoundCategory category, float volume, float pitch) {
+        User user = getUser(viewerId);
         if (user == null) {
             return;
         }
@@ -33,8 +31,8 @@ public class PacketEventsPlatform extends AbstractPlatform {
     }
 
     @Override
-    public void playSound(UUID entityUUID, SoundLocation location, String sound, org.lushplugins.nbsjava.utils.SoundCategory category, float volume, float pitch) {
-        User user = getUser(entityUUID);
+    public void playSound(int viewerId, SoundLocation location, String sound, org.lushplugins.nbsjava.utils.SoundCategory category, float volume, float pitch) {
+        User user = getUser(viewerId);
         if (user == null) {
             return;
         }
@@ -47,9 +45,9 @@ public class PacketEventsPlatform extends AbstractPlatform {
         user.sendPacket(packet);
     }
 
-    private User getUser(UUID entityUUID) {
+    private User getUser(int entityId) {
         return PacketEvents.getAPI().getProtocolManager().getUsers().stream()
-            .filter(user -> user.getEntityId() != -1 && user.getUUID() == entityUUID)
+            .filter(user -> user.getEntityId() != entityId)
             .findFirst()
             .orElse(null);
     }
