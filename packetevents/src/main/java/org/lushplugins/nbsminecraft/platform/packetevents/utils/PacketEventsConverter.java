@@ -1,4 +1,4 @@
-package org.lushplugins.nbsminecraft.platform.bukkit.utils;
+package org.lushplugins.nbsminecraft.platform.packetevents.utils;
 
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.util.Vector3i;

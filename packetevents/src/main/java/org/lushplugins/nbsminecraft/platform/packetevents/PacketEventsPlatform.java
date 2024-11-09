@@ -1,4 +1,4 @@
-package org.lushplugins.nbsminecraft.platform.bukkit;
+package org.lushplugins.nbsminecraft.platform.packetevents;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -14,7 +14,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSoundEffect;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
-import org.lushplugins.nbsminecraft.platform.bukkit.utils.PacketEventsConverter;
+import org.lushplugins.nbsminecraft.platform.packetevents.utils.PacketEventsConverter;
 import org.lushplugins.nbsminecraft.utils.AudioListener;
 import org.lushplugins.nbsminecraft.utils.EntityReference;
 import org.lushplugins.nbsminecraft.utils.SoundLocation;

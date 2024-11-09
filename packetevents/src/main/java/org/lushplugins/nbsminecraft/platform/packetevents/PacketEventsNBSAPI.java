@@ -1,4 +1,4 @@
-package org.lushplugins.nbsminecraft.platform.bukkit;
+package org.lushplugins.nbsminecraft.platform.packetevents;
 
 import org.lushplugins.nbsminecraft.NBSAPI;
 
