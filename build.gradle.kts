@@ -73,7 +73,7 @@ subprojects {
 
         publications {
             create<MavenPublication>("maven") {
-                groupId = rootProject.group.toString() + ".nbsjava"
+                groupId = rootProject.group.toString() + ".nbsminecraft"
                 artifactId = rootProject.name + "-" + project.name
                 version = rootProject.version.toString()
                 from(project.components["java"])

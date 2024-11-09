@@ -5,6 +5,6 @@ dependencies {
 
 tasks {
     shadowJar {
-        relocate("cz.koca2000.nbs4j", "org.lushplugins.nbsjava.libs.nbs4j")
+        relocate("cz.koca2000.nbs4j", "org.lushplugins.nbsminecraft.libs.nbs4j")
     }
 }
