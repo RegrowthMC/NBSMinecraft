@@ -1,5 +1,7 @@
 package org.lushplugins.nbsminecraft.platform.bukkit;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
@@ -10,13 +12,20 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntitySoundEffect;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSoundEffect;
+import org.jetbrains.annotations.Nullable;
 import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
 import org.lushplugins.nbsminecraft.platform.bukkit.utils.PacketEventsConverter;
 import org.lushplugins.nbsminecraft.utils.AudioListener;
 import org.lushplugins.nbsminecraft.utils.EntityReference;
 import org.lushplugins.nbsminecraft.utils.SoundLocation;
 
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 public class PacketEventsPlatform extends AbstractPlatform {
+    private final Cache<UUID, User> USER_CACHE = Caffeine.newBuilder()
+        .expireAfterAccess(60, TimeUnit.SECONDS)
+        .build();
 
     @Override
     public void playSound(AudioListener listener, String sound, org.lushplugins.nbsminecraft.utils.SoundCategory category, float volume, float pitch) {
@@ -25,7 +34,7 @@ public class PacketEventsPlatform extends AbstractPlatform {
 
     @Override
     public void playSound(AudioListener listener, EntityReference entityReference, String sound, org.lushplugins.nbsminecraft.utils.SoundCategory category, float volume, float pitch) {
-        User user = getUser(listener);
+        User user = findUser(listener);
         if (user == null) {
             return;
         }
@@ -39,7 +48,7 @@ public class PacketEventsPlatform extends AbstractPlatform {
 
     @Override
     public void playSound(AudioListener listener, SoundLocation location, String sound, org.lushplugins.nbsminecraft.utils.SoundCategory category, float volume, float pitch) {
-        User user = getUser(listener);
+        User user = findUser(listener);
         if (user == null) {
             return;
         }
@@ -52,10 +61,10 @@ public class PacketEventsPlatform extends AbstractPlatform {
         user.sendPacket(packet);
     }
 
-    private User getUser(AudioListener listener) {
-        return PacketEvents.getAPI().getProtocolManager().getUsers().stream()
+    private @Nullable User findUser(AudioListener listener) {
+        return USER_CACHE.get(listener.uuid(), (ignored) -> PacketEvents.getAPI().getProtocolManager().getUsers().stream()
             .filter(user -> user.getEntityId() == listener.entityId() && user.getUUID() == listener.uuid())
             .findFirst()
-            .orElse(null);
+            .orElse(null));
     }
 }

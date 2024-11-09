@@ -26,7 +26,7 @@ public class BukkitPlatform extends AbstractPlatform {
 
     @Override
     public void playSound(AudioListener listener, String sound, org.lushplugins.nbsminecraft.utils.SoundCategory category, float volume, float pitch) {
-        if (!(findEntity(listener.uuid()) instanceof Player player)) {
+        if (!(findPlayer(listener.uuid()) instanceof Player player) || !player.isValid()) {
             return;
         }
 
@@ -35,7 +35,7 @@ public class BukkitPlatform extends AbstractPlatform {
 
     @Override
     public void playSound(AudioListener listener, EntityReference entityReference, String sound, org.lushplugins.nbsminecraft.utils.SoundCategory category, float volume, float pitch) {
-        if (!(findEntity(listener.uuid()) instanceof Player player)) {
+        if (!(findPlayer(listener.uuid()) instanceof Player player) || !player.isValid()) {
             return;
         }
 
@@ -60,7 +60,7 @@ public class BukkitPlatform extends AbstractPlatform {
             return;
         }
 
-        if (!(Bukkit.getEntity(listener.uuid()) instanceof Player player)) {
+        if (!(findPlayer(listener.uuid()) instanceof Player player) || !player.isValid()) {
             return;
         }
 
@@ -68,6 +68,19 @@ public class BukkitPlatform extends AbstractPlatform {
         SoundCategory bukkitCategory = BukkitConverter.convert(category);
 
         player.playSound(bukkitLocation, sound, bukkitCategory, volume, pitch);
+    }
+
+    private @Nullable Player findPlayer(UUID uuid) {
+        try {
+            if (ENTITY_CACHE.get(uuid, () -> Bukkit.getPlayer(uuid)) instanceof Player player) {
+                return player;
+            } else {
+                return null;
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private @Nullable Entity findEntity(UUID uuid) {
