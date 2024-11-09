@@ -26,7 +26,8 @@ public class BukkitPlatform extends AbstractPlatform {
 
     @Override
     public void playSound(AudioListener listener, String sound, org.lushplugins.nbsminecraft.utils.SoundCategory category, float volume, float pitch) {
-        if (!(findPlayer(listener.uuid()) instanceof Player player) || !player.isValid()) {
+        Player player = findPlayer(listener.uuid());
+        if (player == null || !player.isValid()) {
             return;
         }
 
@@ -35,7 +36,8 @@ public class BukkitPlatform extends AbstractPlatform {
 
     @Override
     public void playSound(AudioListener listener, EntityReference entityReference, String sound, org.lushplugins.nbsminecraft.utils.SoundCategory category, float volume, float pitch) {
-        if (!(findPlayer(listener.uuid()) instanceof Player player) || !player.isValid()) {
+        Player player = findPlayer(listener.uuid());
+        if (player == null || !player.isValid()) {
             return;
         }
 
@@ -60,7 +62,8 @@ public class BukkitPlatform extends AbstractPlatform {
             return;
         }
 
-        if (!(findPlayer(listener.uuid()) instanceof Player player) || !player.isValid()) {
+        Player player = findPlayer(listener.uuid());
+        if (player == null || !player.isValid()) {
             return;
         }
 
