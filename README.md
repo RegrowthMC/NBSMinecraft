@@ -1,6 +1,15 @@
 # NBSMinecraft
 NBSMinecraft is an easy to use, asynchronous API for playing `.nbs` music files. This library was made with the intention of offering a lightweight, platformless API to allow the use of note block music on as many Minecraft platforms as possible.
 
+## Supported Platforms
+The project is focused on being platformless, so the majority of platforms can be supported. If you'd like to add native support for a platform to the library, feel free to make a pull request.
+
+We current natively support:
+- [allay](https://github.com/AllayMC/Allay)
+- [bukkit](https://dev.bukkit.org/)
+- [packetevents](https://github.com/retrooper/packetevents)
+
+<br>
 
 ## Commonly Asked Questions
 **Where can I find .nbs files?**
@@ -9,15 +18,10 @@ NBSMinecraft is an easy to use, asynchronous API for playing `.nbs` music files.
 **Can I use .midi files?**
 - You can import .midi files to OpenNBS's [Open Note Block Studio](https://opennbs.org/) and then save them as .nbs files
 
-**What platforms are supported?**
-- The current platforms supported are:
-  - [allay](https://github.com/AllayMC/Allay)
-  - [bukkit](https://dev.bukkit.org/)
-  - [packetevents](https://github.com/retrooper/packetevents)
-
 **What plugins use NBSMinecraft?**
 - *If you would like to add your plugin to this list, please open a pull request!*
 
+<br>
 
 ## Depending on NBSMinecraft
 You can add NBSMinecraft to your project by adding the below into your maven or gradle build file, replace `{platform}` with the platform you would like to target, you can find a list of platforms here.
