@@ -1,4 +1,4 @@
-rootProject.name = "NBSJava"
+rootProject.name = "NBSMinecraft"
 
 include("allay")
 include("api")
