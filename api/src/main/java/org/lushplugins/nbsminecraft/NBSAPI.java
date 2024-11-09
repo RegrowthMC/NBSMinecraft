@@ -8,6 +8,11 @@ import org.lushplugins.nbsminecraft.player.SongPlayerManager;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -52,6 +57,30 @@ public class NBSAPI {
      */
     public Song readSongInputStream(InputStream inputStream) {
         return Song.fromStream(inputStream);
+    }
+
+    /**
+     * Read all songs in a directory
+     * @param directory directory to read from
+     * @return map of file name to song
+     */
+    public Map<String, Song> readSongsInDirectory(File directory) {
+        try (
+            DirectoryStream<Path> fileStream = Files.newDirectoryStream(directory.toPath(), "*.nbs")
+        ) {
+            HashMap<String, Song> songs = new HashMap<>();
+
+            for (Path filePath : fileStream) {
+                File file = filePath.toFile();
+
+                songs.put(file.getName(), readSongFile(file));
+            }
+
+            return songs;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static ScheduledExecutorService getThreadPool() {
