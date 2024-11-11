@@ -1,9 +1,6 @@
 package org.lushplugins.nbsminecraft;
 
 import cz.koca2000.nbs4j.Song;
-import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
-import org.lushplugins.nbsminecraft.player.SongPlayer;
-import org.lushplugins.nbsminecraft.player.SongPlayerManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,24 +14,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class NBSAPI {
-    private static final ScheduledExecutorService THREADS = Executors.newScheduledThreadPool(1);
+    public static final NBSAPI INSTANCE = new NBSAPI();
 
-    private final SongPlayerManager songPlayerManager;
-
-    public NBSAPI(AbstractPlatform platform) {
-        this.songPlayerManager = new SongPlayerManager(platform);
-    }
+    private final ScheduledExecutorService threads = Executors.newScheduledThreadPool(1);
 
     /**
-     * Register a song player to the manager
-     * @param songPlayer song player to register
+     * @return the thread pool used to send sounds to players
      */
-    public void registerPlayer(SongPlayer songPlayer) {
-        songPlayerManager.registerPlayer(songPlayer);
-    }
-
-    public void shutdown() {
-        songPlayerManager.shutdown();
+    public ScheduledExecutorService getThreadPool() {
+        return threads;
     }
 
     /**
@@ -82,9 +70,5 @@ public class NBSAPI {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public static ScheduledExecutorService getThreadPool() {
-        return THREADS;
     }
 }

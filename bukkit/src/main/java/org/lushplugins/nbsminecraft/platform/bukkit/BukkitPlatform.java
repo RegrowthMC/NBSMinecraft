@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class BukkitPlatform extends AbstractPlatform {
+    public static final BukkitPlatform INSTANCE = new BukkitPlatform();
     private final Cache<UUID, Entity> ENTITY_CACHE = CacheBuilder.newBuilder()
         .expireAfterAccess(60, TimeUnit.SECONDS)
         .build();

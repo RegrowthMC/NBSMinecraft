@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class PacketEventsPlatform extends AbstractPlatform {
+    public static final PacketEventsPlatform INSTANCE = new PacketEventsPlatform();
     private final Cache<UUID, User> USER_CACHE = Caffeine.newBuilder()
         .expireAfterAccess(60, TimeUnit.SECONDS)
         .build();

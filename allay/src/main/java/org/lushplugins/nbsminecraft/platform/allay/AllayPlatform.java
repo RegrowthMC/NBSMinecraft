@@ -23,6 +23,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class AllayPlatform extends AbstractPlatform {
+    public static final AllayPlatform INSTANCE = new AllayPlatform();
+
     private final Cache<UUID, Entity> ENTITY_CACHE = CacheBuilder.newBuilder()
         .expireAfterAccess(60, TimeUnit.SECONDS)
         .build();
