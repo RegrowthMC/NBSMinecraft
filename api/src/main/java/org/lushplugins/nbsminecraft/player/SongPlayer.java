@@ -5,6 +5,8 @@ import cz.koca2000.nbs4j.Note;
 import cz.koca2000.nbs4j.Song;
 import org.lushplugins.nbsminecraft.NBSAPI;
 import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
+import org.lushplugins.nbsminecraft.player.emitter.GlobalSoundEmitter;
+import org.lushplugins.nbsminecraft.player.emitter.SoundEmitter;
 import org.lushplugins.nbsminecraft.utils.AudioListener;
 import org.lushplugins.nbsminecraft.utils.Instruments;
 import org.lushplugins.nbsminecraft.song.Playlist;
@@ -19,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SongPlayer {
     private final AbstractPlatform platform;
+    private final SoundEmitter soundEmitter;
     private final SongQueue queue;
     private final HashMap<UUID, AudioListener> listeners = new HashMap<>();
     private final SoundCategory soundCategory;
@@ -30,8 +33,9 @@ public class SongPlayer {
     private int songTick = 0;
     private long songStartTime = -1;
 
-    private SongPlayer(AbstractPlatform platform, SongQueue queue, SoundCategory soundCategory, int volume, boolean transposeNotes) {
+    private SongPlayer(AbstractPlatform platform, SoundEmitter soundEmitter, SongQueue queue, SoundCategory soundCategory, int volume, boolean transposeNotes) {
         this.platform = platform;
+        this.soundEmitter = soundEmitter;
         this.queue = queue;
         this.soundCategory = soundCategory;
         this.volume = volume;
@@ -176,7 +180,7 @@ public class SongPlayer {
                 }
 
                 for (AudioListener listener : listeners.values()) {
-                    platform.playSound(listener, sound, soundCategory, volume, pitch);
+                    soundEmitter.playSound(platform, listener, sound, soundCategory, volume, pitch);
                 }
             }
         }
@@ -194,6 +198,7 @@ public class SongPlayer {
 
     public static class Builder {
         private final AbstractPlatform platform;
+        private SoundEmitter soundEmitter = new GlobalSoundEmitter();
         private SongQueue queue = new SongQueue();
         private SoundCategory soundCategory = SoundCategory.RECORDS;
         private int volume = 100;
@@ -201,6 +206,11 @@ public class SongPlayer {
 
         public Builder(AbstractPlatform platform) {
             this.platform = platform;
+        }
+
+        public Builder soundEmitter(SoundEmitter soundEmitter) {
+            this.soundEmitter = soundEmitter;
+            return this;
         }
 
         public Builder setQueue(SongQueue queue) {
@@ -234,7 +244,7 @@ public class SongPlayer {
         }
 
         public SongPlayer build() {
-            return new SongPlayer(platform, queue, soundCategory, volume, transposeNotes);
+            return new SongPlayer(platform, soundEmitter, queue, soundCategory, volume, transposeNotes);
         }
     }
 }
