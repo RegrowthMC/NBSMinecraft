@@ -102,6 +102,11 @@ public class SongPlayer {
      * Start/continue playing the current song
      */
     public void play() {
+        this.playing = true;
+        tickSong();
+    }
+
+    private void ensurePlaying() {
         if (!playing) {
             this.playing = true;
             tickSong();
@@ -155,7 +160,7 @@ public class SongPlayer {
         this.song = song;
         this.songTick = 0;
         this.songStartTime = Instant.now().getEpochSecond();
-        play();
+        ensurePlaying();
     }
 
     /**
@@ -164,7 +169,7 @@ public class SongPlayer {
      */
     public void queueSong(Song song) {
         queue.queueSong(song);
-        play();
+        ensurePlaying();
     }
 
     /**
@@ -173,7 +178,7 @@ public class SongPlayer {
      */
     public void queueSongs(Collection<Song> songs) {
         queue.queueSongs(songs);
-        play();
+        ensurePlaying();
     }
 
     /**
@@ -183,7 +188,7 @@ public class SongPlayer {
      */
     public void queueSongPriority(Song song) {
         queue.queueSongPriority(song);
-        play();
+        ensurePlaying();
     }
 
     /**
@@ -195,6 +200,7 @@ public class SongPlayer {
         }
 
         if (song == null && queue.isEmpty()) {
+            playing = false;
             return;
         }
 
@@ -298,10 +304,7 @@ public class SongPlayer {
         }
 
         public SongPlayer build() {
-            SongPlayer songPlayer = new SongPlayer(platform, soundEmitter, queue, soundCategory, volume, transposeNotes);
-            songPlayer.tickSong();
-
-            return songPlayer;
+            return new SongPlayer(platform, soundEmitter, queue, soundCategory, volume, transposeNotes);
         }
     }
 }
