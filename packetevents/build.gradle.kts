@@ -8,11 +8,3 @@ dependencies {
     // Projects
     api(project(":api"))
 }
-
-tasks {
-    shadowJar {
-        minimize {
-            exclude("com.github.benmanes.*")
-        }
-    }
-}
