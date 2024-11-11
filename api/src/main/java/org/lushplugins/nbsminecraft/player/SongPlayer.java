@@ -298,7 +298,10 @@ public class SongPlayer {
         }
 
         public SongPlayer build() {
-            return new SongPlayer(platform, soundEmitter, queue, soundCategory, volume, transposeNotes);
+            SongPlayer songPlayer = new SongPlayer(platform, soundEmitter, queue, soundCategory, volume, transposeNotes);
+            songPlayer.tickSong();
+
+            return songPlayer;
         }
     }
 }
