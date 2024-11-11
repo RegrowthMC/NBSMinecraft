@@ -11,6 +11,8 @@ dependencies {
 
 tasks {
     shadowJar {
-        minimize()
+        minimize {
+            exclude("com.github.benmanes.*")
+        }
     }
 }

@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.lushplugins"
-version = "1.0.0-alpha4"
+version = "1.0.0-alpha5"
 
 subprojects {
     apply(plugin="java-library")
@@ -43,6 +43,15 @@ subprojects {
     }
 
     tasks {
+        build {
+            dependsOn(shadowJar)
+        }
+
+        shadowJar {
+            relocate("cz.koca2000.nbs4j", "org.lushplugins.nbsminecraft.libs.nbs4j")
+            relocate("com.github.benmanes.caffeine", "org.lushplugins.nbsminecraft.libs.caffeine")
+        }
+
         withType<JavaCompile> {
             options.encoding = "UTF-8"
         }
