@@ -15,6 +15,7 @@ import org.lushplugins.nbsminecraft.utils.PitchUtils;
 import org.lushplugins.nbsminecraft.utils.SoundCategory;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -27,24 +28,24 @@ public class SongPlayer {
     private final SoundCategory soundCategory;
     private int volume;
     private final boolean transposeNotes;
-    private final boolean autoStop;
 
     private Song song = null;
     private boolean playing = true;
     private int songTick = 0;
     private long songStartTime = -1;
 
-    private SongPlayer(AbstractPlatform platform, SoundEmitter soundEmitter, SongQueue queue, SoundCategory soundCategory, int volume, boolean transposeNotes, boolean autoStop) {
+    private SongPlayer(AbstractPlatform platform, SoundEmitter soundEmitter, SongQueue queue, SoundCategory soundCategory, int volume, boolean transposeNotes) {
         this.platform = platform;
         this.soundEmitter = soundEmitter;
         this.queue = queue;
         this.soundCategory = soundCategory;
         this.volume = volume;
         this.transposeNotes = transposeNotes;
-        this.autoStop = autoStop;
     }
 
     /**
+     * Gets the song queue, adding songs directly to the queue will not ensure that
+     * the player is playing
      * @return player's song queue
      */
     public SongQueue getQueue() {
@@ -132,6 +133,21 @@ public class SongPlayer {
     }
 
     /**
+     * Set the queue loop status
+     * @param loop whether the queue should loop
+     */
+    public void loopQueue(boolean loop) {
+        queue.loop(loop);
+    }
+
+    /**
+     * Shuffle the queue
+     */
+    public void shuffleQueue() {
+        queue.shuffle();
+    }
+
+    /**
      * Immediately plays a song, this will stop the current song
      * @param song song to play
      */
@@ -143,6 +159,34 @@ public class SongPlayer {
     }
 
     /**
+     * Queue a song to be played
+     * @param song song to queue
+     */
+    public void queueSong(Song song) {
+        queue.queueSong(song);
+        play();
+    }
+
+    /**
+     * Queue songs to be played
+     * @param songs songs to queue
+     */
+    public void queueSongs(Collection<Song> songs) {
+        queue.queueSongs(songs);
+        play();
+    }
+
+    /**
+     * Queue a song in the priority queue, songs in the priority queue will be played before
+     * songs in the default queue and will not be effected by queue looping or shuffling.
+     * @param song song to queue
+     */
+    public void queueSongPriority(Song song) {
+        queue.queueSongPriority(song);
+        play();
+    }
+
+    /**
      * Tick the current song
      */
     public void tickSong() {
@@ -150,7 +194,7 @@ public class SongPlayer {
             return;
         }
 
-        if (autoStop && song == null && queue.isEmpty()) {
+        if (song == null && queue.isEmpty()) {
             return;
         }
 
@@ -213,7 +257,6 @@ public class SongPlayer {
         private SoundCategory soundCategory = SoundCategory.RECORDS;
         private int volume = 100;
         private boolean transposeNotes = true;
-        private boolean autoStop = true;
 
         public Builder(AbstractPlatform platform) {
             this.platform = platform;
@@ -254,17 +297,8 @@ public class SongPlayer {
             return this;
         }
 
-        /**
-         * If {@code true} and there are no songs to play the player will automatically stop
-         * @param autoStop whether to enable auto stop
-         */
-        public Builder autoStop(boolean autoStop) {
-            this.autoStop = autoStop;
-            return this;
-        }
-
         public SongPlayer build() {
-            return new SongPlayer(platform, soundEmitter, queue, soundCategory, volume, transposeNotes, autoStop);
+            return new SongPlayer(platform, soundEmitter, queue, soundCategory, volume, transposeNotes);
         }
     }
 }
