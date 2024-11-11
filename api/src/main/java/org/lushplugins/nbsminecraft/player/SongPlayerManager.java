@@ -19,7 +19,13 @@ public class SongPlayerManager {
 
         float tempo = 10;
         long period = (long) (1000 / tempo);
-        heartbeat = NBSAPI.getThreadPool().scheduleAtFixedRate(this::tickSongPlayers, 0, period, TimeUnit.MILLISECONDS);
+        heartbeat = NBSAPI.getThreadPool().scheduleAtFixedRate(() -> {
+            try {
+                tickSongPlayers();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }, 0, period, TimeUnit.MILLISECONDS);
     }
 
     public void registerPlayer(SongPlayer player) {
@@ -34,6 +40,10 @@ public class SongPlayerManager {
         for (SongPlayer songPlayer : Collections.unmodifiableList(players)) {
             if (songPlayer.isShutdown()) {
                 unregisterPlayer(songPlayer);
+                continue;
+            }
+
+            if (!songPlayer.isPlaying()) {
                 continue;
             }
 

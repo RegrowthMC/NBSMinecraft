@@ -17,7 +17,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class NBSAPI {
-    private static final ScheduledExecutorService threads = Executors.newScheduledThreadPool(1);
+    private static final ScheduledExecutorService THREADS = Executors.newScheduledThreadPool(1);
+
     private final SongPlayerManager songPlayerManager;
 
     public NBSAPI(AbstractPlatform platform) {
@@ -84,6 +85,6 @@ public class NBSAPI {
     }
 
     public static ScheduledExecutorService getThreadPool() {
-        return threads;
+        return THREADS;
     }
 }

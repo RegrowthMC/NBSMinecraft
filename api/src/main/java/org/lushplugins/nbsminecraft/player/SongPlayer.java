@@ -78,7 +78,7 @@ public class SongPlayer {
      * @return time in seconds since the start of the current song
      */
     public long getSongPlaytime() {
-        return Instant.now().getEpochSecond() - songStartTime;
+        return songStartTime != -1 ? Instant.now().getEpochSecond() - songStartTime : -1;
     }
 
     /**
@@ -147,9 +147,11 @@ public class SongPlayer {
      * @param song song to play
      */
     public void playSong(Song song) {
-        this.song = song;
-        this.songTick = 0;
-        this.songStartTime = Instant.now().getEpochSecond();
+        if (song != null) {
+            this.song = song;
+            this.songTick = 0;
+            this.songStartTime = Instant.now().getEpochSecond();
+        }
     }
 
     /**
@@ -157,27 +159,30 @@ public class SongPlayer {
      */
     public void tickSong(AbstractPlatform platform) {
         if (song == null) {
+            playSong(queue.poll());
             return;
         }
 
-        for (Layer layer : song.getLayers()) {
-            Note note = layer.getNote(songTick);
-            if (note == null) {
-                continue;
-            }
+        if (!listeners.isEmpty()) {
+            for (Layer layer : song.getLayers()) {
+                Note note = layer.getNote(songTick);
+                if (note == null) {
+                    continue;
+                }
 
-            String sound;
-            if (note.isCustomInstrument()) {
-                sound = song.getCustomInstrument(note.getInstrument()).getName();
-            } else {
-                sound = Instruments.getSound(note.getInstrument());
-            }
+                String sound;
+                if (note.isCustomInstrument()) {
+                    sound = song.getCustomInstrument(note.getInstrument()).getName();
+                } else {
+                    sound = Instruments.getSound(note.getInstrument());
+                }
 
-            float volume = (layer.getVolume() * this.volume * note.getVolume()) / 1_000_000F;
-            float pitch = note.getPitch() / 100f;
+                float volume = (layer.getVolume() * this.volume * note.getVolume()) / 1_000_000F;
+                float pitch = note.getPitch() / 100f;
 
-            for (AudioListener listener : listeners.values()) {
-                platform.playSound(listener, sound, soundCategory, volume, pitch);
+                for (AudioListener listener : listeners.values()) {
+                    platform.playSound(listener, sound, soundCategory, volume, pitch);
+                }
             }
         }
 
