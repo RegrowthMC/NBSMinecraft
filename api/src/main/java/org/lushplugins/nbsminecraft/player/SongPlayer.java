@@ -132,11 +132,9 @@ public class SongPlayer {
      * @param song song to play
      */
     public void playSong(Song song) {
-        if (song != null) {
-            this.song = song;
-            this.songTick = 0;
-            this.songStartTime = Instant.now().getEpochSecond();
-        }
+        this.song = song;
+        this.songTick = 0;
+        this.songStartTime = Instant.now().getEpochSecond();
     }
 
     /**
