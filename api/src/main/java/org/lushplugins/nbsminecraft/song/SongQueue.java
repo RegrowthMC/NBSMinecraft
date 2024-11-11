@@ -103,6 +103,13 @@ public class SongQueue {
     }
 
     /**
+     * @return whether this queue contains no elements
+     */
+    public boolean isEmpty() {
+        return priorityQueue.isEmpty() && queue.isEmpty();
+    }
+
+    /**
      * Set the queue loop status
      * @param loop whether the queue should loop
      */

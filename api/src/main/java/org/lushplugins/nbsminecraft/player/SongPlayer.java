@@ -27,19 +27,21 @@ public class SongPlayer {
     private final SoundCategory soundCategory;
     private int volume;
     private final boolean transposeNotes;
+    private final boolean autoStop;
 
     private Song song = null;
     private boolean playing = true;
     private int songTick = 0;
     private long songStartTime = -1;
 
-    private SongPlayer(AbstractPlatform platform, SoundEmitter soundEmitter, SongQueue queue, SoundCategory soundCategory, int volume, boolean transposeNotes) {
+    private SongPlayer(AbstractPlatform platform, SoundEmitter soundEmitter, SongQueue queue, SoundCategory soundCategory, int volume, boolean transposeNotes, boolean autoStop) {
         this.platform = platform;
         this.soundEmitter = soundEmitter;
         this.queue = queue;
         this.soundCategory = soundCategory;
         this.volume = volume;
         this.transposeNotes = transposeNotes;
+        this.autoStop = autoStop;
     }
 
     /**
@@ -99,8 +101,10 @@ public class SongPlayer {
      * Start/continue playing the current song
      */
     public void play() {
-        this.playing = true;
-        tickSong();
+        if (!playing) {
+            this.playing = true;
+            tickSong();
+        }
     }
 
     /**
@@ -135,6 +139,7 @@ public class SongPlayer {
         this.song = song;
         this.songTick = 0;
         this.songStartTime = Instant.now().getEpochSecond();
+        play();
     }
 
     /**
@@ -145,12 +150,19 @@ public class SongPlayer {
             return;
         }
 
+        if (autoStop && song == null && queue.isEmpty()) {
+            return;
+        }
+
         float tempo = song != null ? song.getTempo(songTick + 1) : 10;
         long period = (long) (1000 / tempo);
         NBSAPI.INSTANCE.getThreadPool().schedule(this::tickSong, period, TimeUnit.MILLISECONDS);
 
         if (song == null) {
-            playSong(queue.poll());
+            if (!queue.isEmpty()) {
+                playSong(queue.poll());
+            }
+
             return;
         }
 
@@ -201,6 +213,7 @@ public class SongPlayer {
         private SoundCategory soundCategory = SoundCategory.RECORDS;
         private int volume = 100;
         private boolean transposeNotes = true;
+        private boolean autoStop = true;
 
         public Builder(AbstractPlatform platform) {
             this.platform = platform;
@@ -241,8 +254,17 @@ public class SongPlayer {
             return this;
         }
 
+        /**
+         * If {@code true} and there are no songs to play the player will automatically stop
+         * @param autoStop whether to enable auto stop
+         */
+        public Builder autoStop(boolean autoStop) {
+            this.autoStop = autoStop;
+            return this;
+        }
+
         public SongPlayer build() {
-            return new SongPlayer(platform, soundEmitter, queue, soundCategory, volume, transposeNotes);
+            return new SongPlayer(platform, soundEmitter, queue, soundCategory, volume, transposeNotes, autoStop);
         }
     }
 }
