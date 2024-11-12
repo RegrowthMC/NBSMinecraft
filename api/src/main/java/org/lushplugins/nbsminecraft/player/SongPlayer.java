@@ -3,6 +3,7 @@ package org.lushplugins.nbsminecraft.player;
 import cz.koca2000.nbs4j.Layer;
 import cz.koca2000.nbs4j.Note;
 import cz.koca2000.nbs4j.Song;
+import org.jetbrains.annotations.Nullable;
 import org.lushplugins.nbsminecraft.NBSAPI;
 import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
 import org.lushplugins.nbsminecraft.player.emitter.GlobalSoundEmitter;
@@ -74,6 +75,13 @@ public class SongPlayer {
      */
     public void setVolume(int volume) {
         this.volume = volume;
+    }
+
+    /**
+     * @return current song
+     */
+    public @Nullable Song getCurrentSong() {
+        return song;
     }
 
     /**
