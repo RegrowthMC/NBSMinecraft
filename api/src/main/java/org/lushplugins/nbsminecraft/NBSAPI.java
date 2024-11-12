@@ -1,6 +1,7 @@
 package org.lushplugins.nbsminecraft;
 
 import cz.koca2000.nbs4j.Song;
+import cz.koca2000.nbs4j.SongCorruptedException;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,8 @@ public class NBSAPI {
     public Song readSongFile(File file) {
         try {
             return Song.fromFile(file);
-        } catch (IOException e) {
+        } catch (IOException | SongCorruptedException e) {
+            // TODO: Log error with song name
             e.printStackTrace();
             return null;
         }
@@ -61,8 +63,11 @@ public class NBSAPI {
 
             for (Path filePath : fileStream) {
                 File file = filePath.toFile();
+                Song song = readSongFile(file);
 
-                songs.put(file.getName(), readSongFile(file));
+                if (song != null) {
+                    songs.put(file.getName(), song);
+                }
             }
 
             return songs;
