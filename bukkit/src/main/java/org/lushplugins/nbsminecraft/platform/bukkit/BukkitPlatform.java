@@ -16,13 +16,12 @@ import org.lushplugins.nbsminecraft.utils.EntityReference;
 import org.lushplugins.nbsminecraft.utils.SoundLocation;
 
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class BukkitPlatform extends AbstractPlatform {
     public static final BukkitPlatform INSTANCE = new BukkitPlatform();
     private final Cache<UUID, Entity> ENTITY_CACHE = CacheBuilder.newBuilder()
-        .expireAfterAccess(60, TimeUnit.SECONDS)
+        .expireAfterAccess(5, TimeUnit.SECONDS)
         .build();
 
     @Override
@@ -75,24 +74,33 @@ public class BukkitPlatform extends AbstractPlatform {
     }
 
     private @Nullable Player findPlayer(UUID uuid) {
-        try {
-            if (ENTITY_CACHE.get(uuid, () -> Bukkit.getPlayer(uuid)) instanceof Player player) {
-                return player;
-            } else {
-                return null;
+        Entity entity = ENTITY_CACHE.getIfPresent(uuid);
+        if (!(entity instanceof Player player) || !player.isValid()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                ENTITY_CACHE.put(uuid, player);
             }
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return null;
+
+            return player;
+        } else {
+            return player;
         }
     }
 
     private @Nullable Entity findEntity(UUID uuid) {
-        try {
-            return ENTITY_CACHE.get(uuid, () -> Bukkit.getEntity(uuid));
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return null;
+        Entity entity = ENTITY_CACHE.getIfPresent(uuid);
+        if (entity == null || !entity.isValid()) {
+            entity = Bukkit.getEntity(uuid);
+            if (entity != null) {
+                ENTITY_CACHE.put(uuid, entity);
+            }
         }
+
+        return entity;
+    }
+
+    @Override
+    public void invalidateIfCached(AudioListener listener) {
+        ENTITY_CACHE.invalidate(listener.uuid());
     }
 }

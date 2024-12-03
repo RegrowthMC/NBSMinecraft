@@ -3,6 +3,7 @@ package org.lushplugins.nbsminecraft.platform.packetevents;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
@@ -25,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class PacketEventsPlatform extends AbstractPlatform {
     public static final PacketEventsPlatform INSTANCE = new PacketEventsPlatform();
     private final Cache<UUID, User> USER_CACHE = Caffeine.newBuilder()
-        .expireAfterAccess(60, TimeUnit.SECONDS)
+        .expireAfterAccess(5, TimeUnit.SECONDS)
         .build();
 
     @Override
@@ -63,9 +64,23 @@ public class PacketEventsPlatform extends AbstractPlatform {
     }
 
     private @Nullable User findUser(AudioListener listener) {
-        return USER_CACHE.get(listener.uuid(), (ignored) -> PacketEvents.getAPI().getProtocolManager().getUsers().stream()
-            .filter(user -> user.getEntityId() == listener.entityId() && user.getUUID() == listener.uuid())
-            .findFirst()
-            .orElse(null));
+        User user = USER_CACHE.getIfPresent(listener.uuid());
+        if (user == null || !ChannelHelper.isOpen(user.getChannel())) {
+            user = PacketEvents.getAPI().getProtocolManager().getUsers().stream()
+                .filter(foundUser -> foundUser.getEntityId() == listener.entityId() && foundUser.getUUID() == listener.uuid())
+                .findFirst()
+                .orElse(null);
+
+            if (user != null) {
+                USER_CACHE.put(listener.uuid(), user);
+            }
+        }
+
+        return user;
+    }
+
+    @Override
+    public void invalidateIfCached(AudioListener listener) {
+        USER_CACHE.invalidate(listener.uuid());
     }
 }

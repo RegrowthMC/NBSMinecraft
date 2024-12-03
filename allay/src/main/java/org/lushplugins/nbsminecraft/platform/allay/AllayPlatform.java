@@ -19,14 +19,13 @@ import org.lushplugins.nbsminecraft.utils.SoundLocation;
 import org.lushplugins.nbsminecraft.platform.allay.utils.AllayConverter;
 
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class AllayPlatform extends AbstractPlatform {
     public static final AllayPlatform INSTANCE = new AllayPlatform();
 
     private final Cache<UUID, Entity> ENTITY_CACHE = CacheBuilder.newBuilder()
-        .expireAfterAccess(60, TimeUnit.SECONDS)
+        .expireAfterAccess(5, TimeUnit.SECONDS)
         .build();
 
     @Override
@@ -83,36 +82,43 @@ public class AllayPlatform extends AbstractPlatform {
     }
 
     private @Nullable EntityPlayer findPlayer(EntityReference entityReference) {
-        try {
-            Entity entity = ENTITY_CACHE.get(entityReference.uuid(), () -> Server.getInstance().getOnlinePlayers().get(entityReference.uuid()));
-            if (entity instanceof EntityPlayer player) {
-                return player;
-            } else {
-                return null;
+        Entity entity = ENTITY_CACHE.getIfPresent(entityReference.uuid());
+        if (!(entity instanceof EntityPlayer player) || player.isDisconnected()) {
+            EntityPlayer player = Server.getInstance().getOnlinePlayers().get(entityReference.uuid());
+            if (player != null) {
+                ENTITY_CACHE.put(entityReference.uuid(), player);
             }
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return null;
+
+            return player;
+        } else {
+            return player;
         }
     }
 
     private @Nullable Entity findEntity(EntityReference entityReference) {
-        try {
-            return ENTITY_CACHE.get(entityReference.uuid(), () -> {
-                for (World world : Server.getInstance().getWorldPool().getWorlds().values()) {
-                    for (Dimension dimension : world.getDimensions().values()) {
-                        Entity entity = dimension.getEntityByRuntimeId(entityReference.entityId());
-                        if (entity != null) {
-                            return entity;
-                        }
-                    }
-                }
-
-                return null;
-            });
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            return null;
+        Entity entity = ENTITY_CACHE.getIfPresent(entityReference.uuid());
+        if (entity == null || entity.isSpawned()) {
+            entity = getEntity(entityReference.entityId());
+            if (entity != null) {
+                ENTITY_CACHE.put(entityReference.uuid(), entity);
+            }
         }
+
+        return entity;
+    }
+
+    private Entity getEntity(int entityId) {
+        for (World world : Server.getInstance().getWorldPool().getWorlds().values()) {
+            for (Dimension dimension : world.getDimensions().values()) {
+                return dimension.getEntityByRuntimeId(entityId);
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void invalidateIfCached(AudioListener listener) {
+        ENTITY_CACHE.invalidate(listener.uuid());
     }
 }
