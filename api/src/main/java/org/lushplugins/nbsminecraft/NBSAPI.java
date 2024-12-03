@@ -13,9 +13,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NBSAPI {
     public static final NBSAPI INSTANCE = new NBSAPI();
+    private static final Logger LOGGER = Logger.getLogger("NBSMinecraft");
 
     private final ScheduledExecutorService threads = Executors.newScheduledThreadPool(1);
 
@@ -35,8 +38,7 @@ public class NBSAPI {
         try {
             return Song.fromFile(file);
         } catch (IOException | SongCorruptedException e) {
-            // TODO: Log error with song name
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, String.format("Failed to read song '%s': ", file.getName()), e);
             return null;
         }
     }
@@ -72,7 +74,7 @@ public class NBSAPI {
 
             return songs;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, String.format("Failed to read songs in directory '%s': ", directory.getName()), e);
             return null;
         }
     }
