@@ -97,7 +97,7 @@ public class AllayPlatform extends AbstractPlatform {
 
     private @Nullable Entity findEntity(EntityReference entityReference) {
         Entity entity = ENTITY_CACHE.getIfPresent(entityReference.uuid());
-        if (entity == null || !entity.isSpawned() || entity.isDead()) {
+        if (entity == null || !entity.isAlive()) {
             entity = getEntity(entityReference.entityId());
             if (entity != null) {
                 ENTITY_CACHE.put(entityReference.uuid(), entity);
