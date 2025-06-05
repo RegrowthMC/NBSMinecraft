@@ -44,7 +44,7 @@ You can add NBSMinecraft to your project by adding the below into your maven or 
 ```xml
 <dependencies>
     <dependency>
-        <groupId>org.lushplugins.pluginupdater</groupId>
+        <groupId>org.lushplugins.nbsminecraft</groupId>
         <artifactId>NBSMinecraft-{platform}</artifactId>
         <version>1.0.0</version>
     </dependency>
@@ -65,7 +65,7 @@ repositories {
 **Artifact:**
 ```gradle
 dependencies {
-    compileOnly "org.lushplugins.pluginupdater:NBSMinecraft-{platform}:1.0.0"
+    compileOnly "org.lushplugins.nbsminecraft:NBSMinecraft-{platform}:1.0.0"
 }
 ```
 </details>
