@@ -72,5 +72,28 @@ dependencies {
 
 <br>
 
+## Basic Usage
+
+### Creating a SongPlayer
+Each platform has it's own SongPlayer instance that you can create to play songs.
+You can make use of different emitters to play songs to different players, these can be tied to locations, played globally or you could even make custom emitters for your specific requirements!
+
+This is an example of how you could make a song player with the bukkit platform that plays a single song on repeat to all online players:
+```java
+SongPlayer player = BukkitSongPlayer.builder()
+    .emitter(new GlobalSoundEmitter())
+    .queue(song)
+    .build();
+
+player.loopQueue(true);
+player.play();
+```
+
+### Getting a Song instance
+There are multiple methods in the NBTAPI class that you can use to parse `.nbs` files; `readSongFile(File)`, `readSongInputStream(InputStream)` and `Map<String, Song> readSongsInDirectory(File)`.
+
+
+<br>
+
 ## Getting support
 If you need help setting up the API or have any questions, feel free to join the [LushPlugins discord server](https://discord.gg/mbPxvAxP3m)
