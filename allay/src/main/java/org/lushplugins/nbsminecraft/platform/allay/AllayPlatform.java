@@ -10,7 +10,7 @@ import org.allaymc.api.world.World;
 import org.cloudburstmc.math.vector.Vector3f;
 import org.cloudburstmc.protocol.bedrock.packet.PlaySoundPacket;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3fc;
+import org.joml.Vector3dc;
 import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
 import org.lushplugins.nbsminecraft.utils.AudioListener;
 import org.lushplugins.nbsminecraft.utils.EntityReference;
@@ -35,7 +35,7 @@ public class AllayPlatform extends AbstractPlatform {
             return;
         }
 
-        Vector3fc vector = player.getLocation();
+        Vector3dc vector = player.getLocation();
         Vector3f position = Vector3f.from(vector.x(), vector.y(), vector.z());
 
         playSound(player, position, sound, volume, pitch);
@@ -53,7 +53,7 @@ public class AllayPlatform extends AbstractPlatform {
             return;
         }
 
-        Vector3fc vector = player.getLocation();
+        Vector3dc vector = player.getLocation();
         Vector3f position = Vector3f.from(vector.x(), vector.y(), vector.z());
 
         playSound(player, position, sound, volume, pitch);
@@ -84,7 +84,7 @@ public class AllayPlatform extends AbstractPlatform {
     private @Nullable EntityPlayer findPlayer(EntityReference entityReference) {
         Entity entity = ENTITY_CACHE.getIfPresent(entityReference.uuid());
         if (!(entity instanceof EntityPlayer player) || player.isDisconnected()) {
-            EntityPlayer player = Server.getInstance().getOnlinePlayers().get(entityReference.uuid());
+            EntityPlayer player = Server.getInstance().getPlayerService().getPlayers().get(entityReference.uuid());
             if (player != null) {
                 ENTITY_CACHE.put(entityReference.uuid(), player);
             }
@@ -110,7 +110,7 @@ public class AllayPlatform extends AbstractPlatform {
     private Entity getEntity(int entityId) {
         for (World world : Server.getInstance().getWorldPool().getWorlds().values()) {
             for (Dimension dimension : world.getDimensions().values()) {
-                return dimension.getEntityByRuntimeId(entityId);
+                return dimension.getEntityService().getEntity(entityId);
             }
         }
 
