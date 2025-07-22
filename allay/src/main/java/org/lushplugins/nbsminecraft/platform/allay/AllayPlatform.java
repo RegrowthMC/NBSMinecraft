@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class AllayPlatform extends AbstractPlatform {
     public static final AllayPlatform INSTANCE = new AllayPlatform();
 
-    private final Cache<UUID, Entity> ENTITY_CACHE = CacheBuilder.newBuilder()
+    private final Cache<UUID, Entity> entityCache = CacheBuilder.newBuilder()
         .expireAfterAccess(5, TimeUnit.SECONDS)
         .build();
 
@@ -82,11 +82,11 @@ public class AllayPlatform extends AbstractPlatform {
     }
 
     private @Nullable EntityPlayer findPlayer(EntityReference entityReference) {
-        Entity entity = ENTITY_CACHE.getIfPresent(entityReference.uuid());
+        Entity entity = entityCache.getIfPresent(entityReference.uuid());
         if (!(entity instanceof EntityPlayer player) || player.isDisconnected()) {
             EntityPlayer player = Server.getInstance().getPlayerService().getPlayers().get(entityReference.uuid());
             if (player != null) {
-                ENTITY_CACHE.put(entityReference.uuid(), player);
+                entityCache.put(entityReference.uuid(), player);
             }
 
             return player;
@@ -96,11 +96,11 @@ public class AllayPlatform extends AbstractPlatform {
     }
 
     private @Nullable Entity findEntity(EntityReference entityReference) {
-        Entity entity = ENTITY_CACHE.getIfPresent(entityReference.uuid());
+        Entity entity = entityCache.getIfPresent(entityReference.uuid());
         if (entity == null || !entity.isAlive()) {
             entity = getEntity(entityReference.entityId());
             if (entity != null) {
-                ENTITY_CACHE.put(entityReference.uuid(), entity);
+                entityCache.put(entityReference.uuid(), entity);
             }
         }
 
@@ -119,6 +119,6 @@ public class AllayPlatform extends AbstractPlatform {
 
     @Override
     public void invalidateIfCached(AudioListener listener) {
-        ENTITY_CACHE.invalidate(listener.uuid());
+        entityCache.invalidate(listener.uuid());
     }
 }

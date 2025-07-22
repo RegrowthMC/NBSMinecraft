@@ -25,7 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 public class PacketEventsPlatform extends AbstractPlatform {
     public static final PacketEventsPlatform INSTANCE = new PacketEventsPlatform();
-    private final Cache<UUID, User> USER_CACHE = Caffeine.newBuilder()
+
+    private final Cache<UUID, User> userCache = Caffeine.newBuilder()
         .expireAfterAccess(5, TimeUnit.SECONDS)
         .build();
 
@@ -64,7 +65,7 @@ public class PacketEventsPlatform extends AbstractPlatform {
     }
 
     private @Nullable User findUser(AudioListener listener) {
-        User user = USER_CACHE.getIfPresent(listener.uuid());
+        User user = userCache.getIfPresent(listener.uuid());
         if (user == null || !ChannelHelper.isOpen(user.getChannel())) {
             user = PacketEvents.getAPI().getProtocolManager().getUsers().stream()
                 .filter(foundUser -> foundUser.getEntityId() == listener.entityId() && foundUser.getUUID() == listener.uuid())
@@ -72,7 +73,7 @@ public class PacketEventsPlatform extends AbstractPlatform {
                 .orElse(null);
 
             if (user != null) {
-                USER_CACHE.put(listener.uuid(), user);
+                userCache.put(listener.uuid(), user);
             }
         }
 
@@ -81,6 +82,6 @@ public class PacketEventsPlatform extends AbstractPlatform {
 
     @Override
     public void invalidateIfCached(AudioListener listener) {
-        USER_CACHE.invalidate(listener.uuid());
+        userCache.invalidate(listener.uuid());
     }
 }

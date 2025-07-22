@@ -20,7 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BukkitPlatform extends AbstractPlatform {
     public static final BukkitPlatform INSTANCE = new BukkitPlatform();
-    private final Cache<UUID, Entity> ENTITY_CACHE = CacheBuilder.newBuilder()
+
+    private final Cache<UUID, Entity> entityCache = CacheBuilder.newBuilder()
         .expireAfterAccess(5, TimeUnit.SECONDS)
         .build();
 
@@ -74,11 +75,11 @@ public class BukkitPlatform extends AbstractPlatform {
     }
 
     private @Nullable Player findPlayer(UUID uuid) {
-        Entity entity = ENTITY_CACHE.getIfPresent(uuid);
+        Entity entity = entityCache.getIfPresent(uuid);
         if (!(entity instanceof Player player) || !player.isValid()) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                ENTITY_CACHE.put(uuid, player);
+                entityCache.put(uuid, player);
             }
 
             return player;
@@ -88,11 +89,11 @@ public class BukkitPlatform extends AbstractPlatform {
     }
 
     private @Nullable Entity findEntity(UUID uuid) {
-        Entity entity = ENTITY_CACHE.getIfPresent(uuid);
+        Entity entity = entityCache.getIfPresent(uuid);
         if (entity == null || !entity.isValid()) {
             entity = Bukkit.getEntity(uuid);
             if (entity != null) {
-                ENTITY_CACHE.put(uuid, entity);
+                entityCache.put(uuid, entity);
             }
         }
 
@@ -101,6 +102,6 @@ public class BukkitPlatform extends AbstractPlatform {
 
     @Override
     public void invalidateIfCached(AudioListener listener) {
-        ENTITY_CACHE.invalidate(listener.uuid());
+        entityCache.invalidate(listener.uuid());
     }
 }
