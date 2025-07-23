@@ -81,7 +81,7 @@ You can make use of different emitters to play songs to different players, these
 This is an example of how you could make a song player with the bukkit platform that plays a single song on repeat to all online players:
 ```java
 SongPlayer player = BukkitSongPlayer.builder()
-    .emitter(new GlobalSoundEmitter())
+    .soundEmitter(new GlobalSoundEmitter())
     .queue(song)
     .build();
 
