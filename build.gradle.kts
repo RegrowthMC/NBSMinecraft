@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("io.github.goooler.shadow") version("8.1.7")
+    id("com.gradleup.shadow") version("8.3.0")
 }
 
 group = "org.lushplugins"
@@ -9,7 +9,7 @@ version = "1.0.0-alpha33"
 
 allprojects {
     apply(plugin="java-library")
-    apply(plugin="io.github.goooler.shadow")
+    apply(plugin="com.gradleup.shadow")
 
     tasks {
         build {
@@ -18,7 +18,6 @@ allprojects {
 
         shadowJar {
             relocate("cz.koca2000.nbs4j", "org.lushplugins.nbsminecraft.libs.nbs4j")
-            relocate("com.github.benmanes.caffeine", "org.lushplugins.nbsminecraft.libs.caffeine")
         }
     }
 }
@@ -26,7 +25,6 @@ allprojects {
 subprojects {
     apply(plugin="java-library")
     apply(plugin="maven-publish")
-    apply(plugin="io.github.goooler.shadow")
 
     group = rootProject.group
     version = rootProject.version

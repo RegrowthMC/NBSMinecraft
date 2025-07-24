@@ -8,3 +8,9 @@ dependencies {
     // Projects
     api(project(":api"))
 }
+
+tasks {
+    shadowJar {
+        relocate("com.github.benmanes.caffeine", "org.lushplugins.nbsminecraft.libs.caffeine")
+    }
+}

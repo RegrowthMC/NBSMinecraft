@@ -11,8 +11,18 @@ dependencies {
 
     // Projects
     api(project(":api"))
+
+    // Dependencies to include in jar
+    include(project(":api"))
+    include("com.github.koca2000:NBS4j:1.3.0")
 }
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
+tasks {
+    shadowJar {
+        enabled = false
+    }
 }
