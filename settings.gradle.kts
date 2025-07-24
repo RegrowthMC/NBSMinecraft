@@ -5,6 +5,7 @@ include("api")
 include("allay")
 include("bukkit")
 include("fabric")
+include("neoforge")
 include("packetevents")
 
 pluginManagement {
@@ -12,5 +13,6 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         maven("https://maven.fabricmc.net/")
+        maven("https://maven.neoforged.net/releases")
     }
 }
