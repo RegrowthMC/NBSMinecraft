@@ -7,6 +7,8 @@ The project is focused on being platformless, so the majority of platforms can b
 We current natively support:
 - [allay](https://github.com/AllayMC/Allay)
 - [bukkit](https://dev.bukkit.org/)
+- [fabric](https://fabricmc.net/) (Experimental - untested, use with caution)
+- [neoforge](https://neoforged.net/) (Experimental - untested, use with caution)
 - [packetevents](https://github.com/retrooper/packetevents)
 
 <br>
