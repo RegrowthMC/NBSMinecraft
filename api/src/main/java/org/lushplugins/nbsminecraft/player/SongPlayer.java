@@ -115,7 +115,7 @@ public class SongPlayer {
     }
 
     private void ensurePlaying() {
-        if (!playing) {
+        if (!this.playing) {
             this.playing = true;
             tickSong();
         }
@@ -210,11 +210,10 @@ public class SongPlayer {
         if (this.song == null) {
             if (this.queue.isEmpty()) {
                 playing = false;
+                return;
             } else {
                 playSong(queue.poll());
             }
-
-            return;
         }
 
         float tempo = this.song.getTempo(this.songTick + 1);
