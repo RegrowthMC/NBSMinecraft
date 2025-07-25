@@ -14,7 +14,7 @@ dependencies {
 
     // Dependencies to include in jar
     include(project(":api"))
-    include("com.github.koca2000:NBS4j:1.3.0")
+    include("net.raphimc:NoteBlockLib:3.1.0")
 }
 
 java {

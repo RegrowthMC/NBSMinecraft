@@ -1,18 +1,18 @@
 package org.lushplugins.nbsminecraft.player;
 
-import cz.koca2000.nbs4j.Layer;
-import cz.koca2000.nbs4j.Note;
-import cz.koca2000.nbs4j.Song;
+import net.raphimc.noteblocklib.data.MinecraftDefinitions;
+import net.raphimc.noteblocklib.data.MinecraftInstrument;
+import net.raphimc.noteblocklib.format.nbs.model.NbsCustomInstrument;
+import net.raphimc.noteblocklib.model.Note;
+import net.raphimc.noteblocklib.model.Song;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.nbsminecraft.NBSAPI;
 import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
 import org.lushplugins.nbsminecraft.player.emitter.GlobalSoundEmitter;
 import org.lushplugins.nbsminecraft.player.emitter.SoundEmitter;
 import org.lushplugins.nbsminecraft.utils.AudioListener;
-import org.lushplugins.nbsminecraft.utils.Instruments;
 import org.lushplugins.nbsminecraft.song.Playlist;
 import org.lushplugins.nbsminecraft.song.SongQueue;
-import org.lushplugins.nbsminecraft.utils.PitchUtils;
 import org.lushplugins.nbsminecraft.utils.SoundCategory;
 
 import java.time.Instant;
@@ -99,7 +99,7 @@ public class SongPlayer {
      * @return total duration of current song in seconds
      */
     public long getSongDuration() {
-        return (long) this.song.getSongLengthInSeconds();
+        return this.song.getLengthInSeconds();
     }
 
     /**
@@ -231,32 +231,35 @@ public class SongPlayer {
                 }
             }
 
-            float tempo = this.song.getTempo(this.songTick + 1);
+            float tempo = this.song.getTempoEvents().getEffectiveTempo(this.songTick + 1);
             long period = (long) (1000 / tempo);
             NBSAPI.INSTANCE.getThreadPool().schedule(this::tickSong, period, TimeUnit.MILLISECONDS);
 
             if (!this.listeners.isEmpty() && this.volume > 0) {
-                for (Layer layer : this.song.getLayers()) {
-                    Note note = layer.getNote(this.songTick);
+                for (Note note : this.song.getNotes().get(this.songTick)) {
                     if (note == null) {
                         continue;
                     }
 
-                    String sound;
-                    if (note.isCustomInstrument()) {
-                        sound = this.song.getCustomInstrument(note.getInstrument()).getName();
+                    // TODO: Move note shifting into NBSAPI class and modify notes when reading song
+                    if (this.transposeNotes) {
+                        MinecraftDefinitions.instrumentShiftNote(note);
+                        MinecraftDefinitions.transposeNoteKey(note);
                     } else {
-                        sound = Instruments.getSound(note.getInstrument());
+                        MinecraftDefinitions.applyExtendedNotesResourcePack(note);
                     }
 
-                    float volume = (layer.getVolume() * this.volume * note.getVolume()) / 1_000_000F;
-                    float pitch;
-                    if (this.transposeNotes) {
-                        pitch = PitchUtils.getTransposedPitch(note);
+                    String sound;
+                    if (note.getInstrument() instanceof NbsCustomInstrument instrument) {
+                        sound = instrument.getName();
+                    } else if (note.getInstrument() instanceof MinecraftInstrument instrument) {
+                        sound = instrument.mcSoundName();
                     } else {
-                        sound = PitchUtils.addOctaveSuffix(sound, note.getKey());
-                        pitch = PitchUtils.getPitchInOctave(note);
+                        throw new IllegalStateException("Invalid instrument found");
                     }
+
+                    float volume = (this.volume * note.getVolume()) / 1_000_000F;
+                    float pitch = note.getPitch();
 
                     for (AudioListener listener : this.listeners.values()) {
                         this.soundEmitter.playSound(this.platform, listener, sound.toLowerCase(), this.soundCategory, volume, pitch);
@@ -269,7 +272,7 @@ public class SongPlayer {
             if (this.song != null) {
                 ++this.songTick;
 
-                if (this.song.getSongLength() < this.songTick) {
+                if (this.song.getNotes().getLengthInTicks() < this.songTick) {
                     this.onSongFinish();
                 }
             }
