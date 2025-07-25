@@ -19,9 +19,11 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class SongPlayer {
+    private final Semaphore semaphore = new Semaphore(1);
     private final AbstractPlatform platform;
     private final SoundEmitter soundEmitter;
     private final SongQueue queue;
@@ -220,33 +222,41 @@ public class SongPlayer {
         long period = (long) (1000 / tempo);
         NBSAPI.INSTANCE.getThreadPool().schedule(this::tickSong, period, TimeUnit.MILLISECONDS);
 
-        if (!this.listeners.isEmpty() && this.volume > 0) {
-            for (Layer layer : this.song.getLayers()) {
-                Note note = layer.getNote(this.songTick);
-                if (note == null) {
-                    continue;
-                }
+        try {
+            this.semaphore.acquire();
 
-                String sound;
-                if (note.isCustomInstrument()) {
-                    sound = this.song.getCustomInstrument(note.getInstrument()).getName();
-                } else {
-                    sound = Instruments.getSound(note.getInstrument());
-                }
+            if (!this.listeners.isEmpty() && this.volume > 0) {
+                for (Layer layer : this.song.getLayers()) {
+                    Note note = layer.getNote(this.songTick);
+                    if (note == null) {
+                        continue;
+                    }
 
-                float volume = (layer.getVolume() * this.volume * note.getVolume()) / 1_000_000F;
-                float pitch;
-                if (this.transposeNotes) {
-                    pitch = PitchUtils.getTransposedPitch(note);
-                } else {
-                    sound = PitchUtils.addOctaveSuffix(sound, note.getKey());
-                    pitch = PitchUtils.getPitchInOctave(note);
-                }
+                    String sound;
+                    if (note.isCustomInstrument()) {
+                        sound = this.song.getCustomInstrument(note.getInstrument()).getName();
+                    } else {
+                        sound = Instruments.getSound(note.getInstrument());
+                    }
 
-                for (AudioListener listener : this.listeners.values()) {
-                    this.soundEmitter.playSound(this.platform, listener, sound, this.soundCategory, volume, pitch);
+                    float volume = (layer.getVolume() * this.volume * note.getVolume()) / 1_000_000F;
+                    float pitch;
+                    if (this.transposeNotes) {
+                        pitch = PitchUtils.getTransposedPitch(note);
+                    } else {
+                        sound = PitchUtils.addOctaveSuffix(sound, note.getKey());
+                        pitch = PitchUtils.getPitchInOctave(note);
+                    }
+
+                    for (AudioListener listener : this.listeners.values()) {
+                        this.soundEmitter.playSound(this.platform, listener, sound, this.soundCategory, volume, pitch);
+                    }
                 }
             }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            this.semaphore.release();
         }
 
         this.songTick++;
