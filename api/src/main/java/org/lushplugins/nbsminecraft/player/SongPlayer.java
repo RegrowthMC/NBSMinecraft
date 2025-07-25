@@ -50,7 +50,7 @@ public class SongPlayer {
      * @return player's song queue
      */
     public SongQueue getQueue() {
-        return queue;
+        return this.queue;
     }
 
     /**
@@ -58,7 +58,7 @@ public class SongPlayer {
      * @param listener audio listener
      */
     public void addListener(AudioListener listener) {
-        listeners.put(listener.uuid(), listener);
+        this.listeners.put(listener.uuid(), listener);
     }
 
     /**
@@ -66,7 +66,7 @@ public class SongPlayer {
      * @param uuid listener's uuid
      */
     public void removeListener(UUID uuid) {
-        listeners.remove(uuid);
+        this.listeners.remove(uuid);
     }
 
     /**
@@ -81,21 +81,21 @@ public class SongPlayer {
      * @return current song
      */
     public @Nullable Song getCurrentSong() {
-        return song;
+        return this.song;
     }
 
     /**
      * @return time in seconds since the start of the current song
      */
     public long getSongPlaytime() {
-        return songStartTime != -1 ? Instant.now().getEpochSecond() - songStartTime : -1;
+        return this.songStartTime != -1 ? Instant.now().getEpochSecond() - this.songStartTime : -1;
     }
 
     /**
      * @return total duration of current song in seconds
      */
     public long getSongDuration() {
-        return (long) song.getSongLengthInSeconds();
+        return (long) this.song.getSongLengthInSeconds();
     }
 
     /**
@@ -125,24 +125,24 @@ public class SongPlayer {
      * Pause the current song
      */
     public void pause() {
-        playing = false;
+        this.playing = false;
     }
 
     /**
      * Stop the player and clear the queue
      */
     public void stop() {
-        playing = false;
-        queue.clearQueue();
-        song = null;
-        songTick = 0;
+        this.playing = false;
+        this.queue.clearQueue();
+        this.song = null;
+        this.songTick = 0;
     }
 
     /**
      * Skip to the next queue song
      */
     public void skip() {
-        playSong(queue.poll());
+        playSong(this.queue.poll());
     }
 
     /**
@@ -150,14 +150,14 @@ public class SongPlayer {
      * @param loop whether the queue should loop
      */
     public void loopQueue(boolean loop) {
-        queue.loop(loop);
+        this.queue.loop(loop);
     }
 
     /**
      * Shuffle the queue
      */
     public void shuffleQueue() {
-        queue.shuffle();
+        this.queue.shuffle();
     }
 
     /**
@@ -176,7 +176,7 @@ public class SongPlayer {
      * @param song song to queue
      */
     public void queueSong(Song song) {
-        queue.queueSong(song);
+        this.queue.queueSong(song);
         ensurePlaying();
     }
 
@@ -185,7 +185,7 @@ public class SongPlayer {
      * @param songs songs to queue
      */
     public void queueSongs(Collection<Song> songs) {
-        queue.queueSongs(songs);
+        this.queue.queueSongs(songs);
         ensurePlaying();
     }
 
@@ -195,7 +195,7 @@ public class SongPlayer {
      * @param song song to queue
      */
     public void queueSongPriority(Song song) {
-        queue.queueSongPriority(song);
+        this.queue.queueSongPriority(song);
         ensurePlaying();
     }
 
@@ -207,61 +207,58 @@ public class SongPlayer {
             return;
         }
 
-        if (song == null && queue.isEmpty()) {
-            playing = false;
-            return;
-        }
-
-        float tempo = song != null ? song.getTempo(songTick + 1) : 10;
-        long period = (long) (1000 / tempo);
-        NBSAPI.INSTANCE.getThreadPool().schedule(this::tickSong, period, TimeUnit.MILLISECONDS);
-
-        if (song == null) {
-            if (!queue.isEmpty()) {
+        if (this.song == null) {
+            if (this.queue.isEmpty()) {
+                playing = false;
+            } else {
                 playSong(queue.poll());
             }
 
             return;
         }
 
-        if (!listeners.isEmpty() && this.volume > 0) {
-            for (Layer layer : song.getLayers()) {
-                Note note = layer.getNote(songTick);
+        float tempo = this.song.getTempo(this.songTick + 1);
+        long period = (long) (1000 / tempo);
+        NBSAPI.INSTANCE.getThreadPool().schedule(this::tickSong, period, TimeUnit.MILLISECONDS);
+
+        if (!this.listeners.isEmpty() && this.volume > 0) {
+            for (Layer layer : this.song.getLayers()) {
+                Note note = layer.getNote(this.songTick);
                 if (note == null) {
                     continue;
                 }
 
                 String sound;
                 if (note.isCustomInstrument()) {
-                    sound = song.getCustomInstrument(note.getInstrument()).getName();
+                    sound = this.song.getCustomInstrument(note.getInstrument()).getName();
                 } else {
                     sound = Instruments.getSound(note.getInstrument());
                 }
 
                 float volume = (layer.getVolume() * this.volume * note.getVolume()) / 1_000_000F;
                 float pitch;
-                if (transposeNotes) {
+                if (this.transposeNotes) {
                     pitch = PitchUtils.getTransposedPitch(note);
                 } else {
                     sound = PitchUtils.addOctaveSuffix(sound, note.getKey());
                     pitch = PitchUtils.getPitchInOctave(note);
                 }
 
-                for (AudioListener listener : listeners.values()) {
-                    soundEmitter.playSound(platform, listener, sound, soundCategory, volume, pitch);
+                for (AudioListener listener : this.listeners.values()) {
+                    this.soundEmitter.playSound(this.platform, listener, sound, this.soundCategory, volume, pitch);
                 }
             }
         }
 
-        songTick++;
+        this.songTick++;
 
-        if (song.getSongLength() < songTick) {
+        if (this.song.getSongLength() < this.songTick) {
             onSongFinish();
         }
     }
 
     private void onSongFinish() {
-        playSong(queue.poll());
+        playSong(this.queue.poll());
     }
 
     public static class Builder {
