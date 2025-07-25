@@ -78,4 +78,9 @@ public class NBSAPI {
             return null;
         }
     }
+
+    public void log(Level level, String message) {
+        LOGGER.log(level, message);
+    }
+
 }

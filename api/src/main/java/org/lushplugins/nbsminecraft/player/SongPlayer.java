@@ -37,6 +37,8 @@ public class SongPlayer {
     private int songTick = 0;
     private long songStartTime = -1;
 
+//    private Long lastTickTime = null; // Debug Code
+
     private SongPlayer(AbstractPlatform platform, SoundEmitter soundEmitter, SongQueue queue, SoundCategory soundCategory, int volume, boolean transposeNotes) {
         this.platform = platform;
         this.soundEmitter = soundEmitter;
@@ -205,6 +207,14 @@ public class SongPlayer {
      * Tick the current song
      */
     public void tickSong() {
+        // Debugging Code
+//        long currTickTime = Instant.now().toEpochMilli();
+//        NBSAPI.INSTANCE.log(Level.INFO, "%s - %s".formatted(
+//            this.songTick,
+//             this.lastTickTime != null ? currTickTime - this.lastTickTime : 0
+//        ));
+//        this.lastTickTime = currTickTime;
+
         if (!isPlaying()) {
             return;
         }
