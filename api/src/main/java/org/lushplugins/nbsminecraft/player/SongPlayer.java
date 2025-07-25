@@ -249,19 +249,21 @@ public class SongPlayer {
                     }
 
                     for (AudioListener listener : this.listeners.values()) {
-                        this.soundEmitter.playSound(this.platform, listener, sound, this.soundCategory, volume, pitch);
+                        this.soundEmitter.playSound(this.platform, listener, sound.toLowerCase(), this.soundCategory, volume, pitch);
                     }
                 }
-            }
-
-            this.songTick++;
-
-            if (this.song.getSongLength() < this.songTick) {
-                onSongFinish();
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
+            if (this.song != null) {
+                ++this.songTick;
+
+                if (this.song.getSongLength() < this.songTick) {
+                    this.onSongFinish();
+                }
+            }
+
             this.semaphore.release();
         }
     }
