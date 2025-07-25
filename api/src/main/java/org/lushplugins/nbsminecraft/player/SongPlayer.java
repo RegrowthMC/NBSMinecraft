@@ -211,6 +211,7 @@ public class SongPlayer {
 
         try {
             this.semaphore.acquire();
+
             if (this.song == null) {
                 if (this.queue.isEmpty()) {
                     playing = false;
