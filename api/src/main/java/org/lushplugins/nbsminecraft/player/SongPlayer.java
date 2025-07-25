@@ -266,7 +266,7 @@ public class SongPlayer {
         private SongQueue queue = new SongQueue();
         private SoundCategory soundCategory = SoundCategory.RECORDS;
         private int volume = 100;
-        private boolean transposeNotes = true;
+        private boolean transposeNotes = false;
 
         public Builder(AbstractPlatform platform) {
             this.platform = platform;
