@@ -209,21 +209,20 @@ public class SongPlayer {
             return;
         }
 
-        if (this.song == null) {
-            if (this.queue.isEmpty()) {
-                playing = false;
-                return;
-            } else {
-                playSong(queue.poll());
-            }
-        }
-
-        float tempo = this.song.getTempo(this.songTick + 1);
-        long period = (long) (1000 / tempo);
-        NBSAPI.INSTANCE.getThreadPool().schedule(this::tickSong, period, TimeUnit.MILLISECONDS);
-
         try {
             this.semaphore.acquire();
+            if (this.song == null) {
+                if (this.queue.isEmpty()) {
+                    playing = false;
+                    return;
+                } else {
+                    playSong(queue.poll());
+                }
+            }
+
+            float tempo = this.song.getTempo(this.songTick + 1);
+            long period = (long) (1000 / tempo);
+            NBSAPI.INSTANCE.getThreadPool().schedule(this::tickSong, period, TimeUnit.MILLISECONDS);
 
             if (!this.listeners.isEmpty() && this.volume > 0) {
                 for (Layer layer : this.song.getLayers()) {
@@ -253,16 +252,16 @@ public class SongPlayer {
                     }
                 }
             }
+
+            this.songTick++;
+
+            if (this.song.getSongLength() < this.songTick) {
+                onSongFinish();
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
             this.semaphore.release();
-        }
-
-        this.songTick++;
-
-        if (this.song.getSongLength() < this.songTick) {
-            onSongFinish();
         }
     }
 
