@@ -255,7 +255,8 @@ public class SongPlayer {
             } else if (note.getInstrument() instanceof MinecraftInstrument instrument) {
                 sound = instrument.mcSoundName();
             } else {
-                throw new IllegalStateException("Invalid instrument found");
+                NBSAPI.INSTANCE.log(Level.WARNING, "Invalid instrument type found: " + note.getInstrument().getClass().getName());
+                return;
             }
 
             float volume = ((SongPlayer.this.volume / 100F) * note.getVolume());
