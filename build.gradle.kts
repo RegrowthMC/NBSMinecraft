@@ -33,6 +33,7 @@ subprojects {
         mavenCentral()
         mavenLocal()
         maven("https://oss.sonatype.org/content/groups/public/")
+        maven("https://maven.lenni0451.net/snapshots/") // NoteblockLib
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
         maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
         maven("https://maven.neoforged.net/releases") // NeoForge
