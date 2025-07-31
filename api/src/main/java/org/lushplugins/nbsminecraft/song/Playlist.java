@@ -1,6 +1,6 @@
 package org.lushplugins.nbsminecraft.song;
 
-import cz.koca2000.nbs4j.Song;
+import net.raphimc.noteblocklib.model.Song;
 
 import java.util.ArrayList;
 import java.util.Arrays;

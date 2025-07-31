@@ -1,0 +1,4 @@
+name: NBSTestPlugin
+version: ${project.version}
+main: org.lushplugins.nbsminecraft.platform.bukkit.test.TestPlugin
+api-version: 1.16

@@ -1,29 +1,29 @@
 package org.lushplugins.nbsminecraft.player;
 
-import cz.koca2000.nbs4j.Layer;
-import cz.koca2000.nbs4j.Note;
-import cz.koca2000.nbs4j.Song;
+import net.raphimc.noteblocklib.data.MinecraftDefinitions;
+import net.raphimc.noteblocklib.data.MinecraftInstrument;
+import net.raphimc.noteblocklib.format.nbs.model.NbsCustomInstrument;
+import net.raphimc.noteblocklib.model.Note;
+import net.raphimc.noteblocklib.model.Song;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.nbsminecraft.NBSAPI;
 import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
 import org.lushplugins.nbsminecraft.player.emitter.GlobalSoundEmitter;
 import org.lushplugins.nbsminecraft.player.emitter.SoundEmitter;
-import org.lushplugins.nbsminecraft.utils.AudioListener;
-import org.lushplugins.nbsminecraft.utils.Instruments;
 import org.lushplugins.nbsminecraft.song.Playlist;
 import org.lushplugins.nbsminecraft.song.SongQueue;
-import org.lushplugins.nbsminecraft.utils.PitchUtils;
+import org.lushplugins.nbsminecraft.utils.AudioListener;
 import org.lushplugins.nbsminecraft.utils.SoundCategory;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class SongPlayer {
-    private final Semaphore semaphore = new Semaphore(1);
+    private final InternalSongPlayer player = new InternalSongPlayer();
     private final AbstractPlatform platform;
     private final SoundEmitter soundEmitter;
     private final SongQueue queue;
@@ -32,12 +32,7 @@ public class SongPlayer {
     private int volume;
     private final boolean transposeNotes;
 
-    private Song song = null;
-    private boolean playing = true;
-    private int songTick = 0;
     private long songStartTime = -1;
-
-//    private Long lastTickTime = null; // Debug Code
 
     private SongPlayer(AbstractPlatform platform, SoundEmitter soundEmitter, SongQueue queue, SoundCategory soundCategory, int volume, boolean transposeNotes) {
         this.platform = platform;
@@ -85,7 +80,7 @@ public class SongPlayer {
      * @return current song
      */
     public @Nullable Song getCurrentSong() {
-        return this.song;
+        return this.player.getSong();
     }
 
     /**
@@ -99,7 +94,7 @@ public class SongPlayer {
      * @return total duration of current song in seconds
      */
     public long getSongDuration() {
-        return (long) this.song.getSongLengthInSeconds();
+        return this.player.getSong().getLengthInSeconds();
     }
 
     /**
@@ -107,21 +102,22 @@ public class SongPlayer {
      * even if no song is currently playing)
      */
     public boolean isPlaying() {
-        return this.playing;
+        return !this.player.isPaused() && this.player.isRunning();
     }
 
     /**
      * Start/continue playing the current song
      */
     public void play() {
-        this.playing = true;
-        tickSong();
+        this.ensurePlaying();
     }
 
     private void ensurePlaying() {
-        if (!this.playing) {
-            this.playing = true;
-            tickSong();
+        this.player.setPaused(false);
+        this.playNextSongIfIdle();
+
+        if (!this.player.isRunning()) {
+            this.player.start(0, this.player.getTick());
         }
     }
 
@@ -129,24 +125,48 @@ public class SongPlayer {
      * Pause the current song
      */
     public void pause() {
-        this.playing = false;
+        this.player.setPaused(true);
     }
 
     /**
      * Stop the player and clear the queue
      */
     public void stop() {
-        this.playing = false;
+        this.player.stop();
         this.queue.clearQueue();
-        this.song = null;
-        this.songTick = 0;
+        this.player.setSong(null);
+        this.player.setTick(0);
+        this.songStartTime = -1;
     }
 
     /**
-     * Skip to the next queue song
+     * Skips to the next song in the queue, if no songs are left in the queue
+     * then the player will be stopped.
      */
     public void skip() {
-        playSong(this.queue.poll());
+        playNextSong();
+    }
+
+    /**
+     * Skips to the next song in the queue, if no songs are left in the queue
+     * then the player will be stopped.
+     */
+    public void playNextSong() {
+        if (!this.queue.isEmpty()) {
+            playSong(this.queue.poll());
+        } else {
+            stop();
+        }
+    }
+
+    /**
+     * Plays the next song in the queue if no song is currently playing, if no songs are
+     * left in the queue then the player will be stopped.
+     */
+    public void playNextSongIfIdle() {
+        if (this.player.getSong() == null) {
+            playNextSong();
+        }
     }
 
     /**
@@ -166,11 +186,17 @@ public class SongPlayer {
 
     /**
      * Immediately plays a song, this will stop the current song
-     * @param song song to play
+     * @param song song to play, if {@code null} then the song player will stop ticking until started again
      */
     public void playSong(Song song) {
-        this.song = song;
-        this.songTick = 0;
+        this.player.setSong(song);
+        this.player.setTick(0);
+
+        if (song == null) {
+            this.player.stop();
+            return;
+        }
+
         this.songStartTime = Instant.now().getEpochSecond();
         ensurePlaying();
     }
@@ -203,83 +229,82 @@ public class SongPlayer {
         ensurePlaying();
     }
 
-    /**
-     * Tick the current song
-     */
-    public void tickSong() {
-        // Debugging Code
-//        long currTickTime = Instant.now().toEpochMilli();
-//        NBSAPI.INSTANCE.log(Level.INFO, "%s - %s".formatted(
-//            this.songTick,
-//             this.lastTickTime != null ? currTickTime - this.lastTickTime : 0
-//        ));
-//        this.lastTickTime = currTickTime;
+    private class InternalSongPlayer extends net.raphimc.noteblocklib.player.SongPlayer {
 
-        if (!isPlaying()) {
-            return;
+        public InternalSongPlayer() {
+            super(null);
         }
 
-        try {
-            this.semaphore.acquire();
-
-            if (this.song == null) {
-                if (this.queue.isEmpty()) {
-                    playing = false;
-                    return;
-                } else {
-                    playSong(queue.poll());
-                }
-            }
-
-            float tempo = this.song.getTempo(this.songTick + 1);
-            long period = (long) (1000 / tempo);
-            NBSAPI.INSTANCE.getThreadPool().schedule(this::tickSong, period, TimeUnit.MILLISECONDS);
-
-            if (!this.listeners.isEmpty() && this.volume > 0) {
-                for (Layer layer : this.song.getLayers()) {
-                    Note note = layer.getNote(this.songTick);
-                    if (note == null) {
-                        continue;
-                    }
-
-                    String sound;
-                    if (note.isCustomInstrument()) {
-                        sound = this.song.getCustomInstrument(note.getInstrument()).getName();
-                    } else {
-                        sound = Instruments.getSound(note.getInstrument());
-                    }
-
-                    float volume = (layer.getVolume() * this.volume * note.getVolume()) / 1_000_000F;
-                    float pitch;
-                    if (this.transposeNotes) {
-                        pitch = PitchUtils.getTransposedPitch(note);
-                    } else {
-                        sound = PitchUtils.addOctaveSuffix(sound, note.getKey());
-                        pitch = PitchUtils.getPitchInOctave(note);
-                    }
-
-                    for (AudioListener listener : this.listeners.values()) {
-                        this.soundEmitter.playSound(this.platform, listener, sound.toLowerCase(), this.soundCategory, volume, pitch);
-                    }
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (this.song != null) {
-                ++this.songTick;
-
-                if (this.song.getSongLength() < this.songTick) {
-                    this.onSongFinish();
-                }
-            }
-
-            this.semaphore.release();
+        @Override
+        public void setSong(Song song) {
+            super.setSong(song);
         }
-    }
 
-    private void onSongFinish() {
-        playSong(this.queue.poll());
+        protected void playNote(Note note) {
+            // TODO: Move note shifting into NBSAPI class and modify notes when reading song
+            if (transposeNotes) {
+                MinecraftDefinitions.instrumentShiftNote(note);
+                MinecraftDefinitions.transposeNoteKey(note);
+            } else {
+                MinecraftDefinitions.applyExtendedNotesResourcePack(note);
+            }
+
+            String sound;
+            if (note.getInstrument() instanceof NbsCustomInstrument instrument) {
+                sound = instrument.getName();
+            } else if (note.getInstrument() instanceof MinecraftInstrument instrument) {
+                sound = instrument.mcSoundName();
+            } else {
+                NBSAPI.INSTANCE.log(Level.WARNING, "Invalid instrument type found: " + note.getInstrument().getClass().getName());
+                return;
+            }
+
+            float volume = ((SongPlayer.this.volume / 100F) * note.getVolume());
+            float pitch = note.getPitch();
+
+            sound = sound.toLowerCase();
+            for (AudioListener listener : listeners.values()) {
+                soundEmitter.playSound(platform, listener, sound, soundCategory, volume, pitch);
+            }
+        }
+
+        @Override
+        protected void playNotes(List<Note> notes) {
+            for (Note note : notes) {
+                if (note == null) {
+                    continue;
+                }
+
+                try {
+                    playNote(note);
+                } catch (Throwable e) {
+                    String exceptionClassName = e.getClass().getSimpleName();
+                    if (exceptionClassName.equals("ResourceLocationException")) {
+                        NBSAPI.INSTANCE.log(Level.WARNING, "Invalid instrument: " + e.getMessage());
+                        return;
+                    }
+
+                    // TODO: Shrink invalid instrument exceptions to 1 line (or parse and remove invalid instruments on song queue)
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        protected boolean shouldTick() {
+            playNextSongIfIdle();
+            return getSong() != null;
+        }
+
+        @Override
+        protected void onSongFinished() {
+            skip();
+        }
+
+        @Override
+        protected void onTickException(Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     public static class Builder {
@@ -294,37 +319,37 @@ public class SongPlayer {
             this.platform = platform;
         }
 
-        public Builder soundEmitter(SoundEmitter soundEmitter) {
+        public SongPlayer.Builder soundEmitter(SoundEmitter soundEmitter) {
             this.soundEmitter = soundEmitter;
             return this;
         }
 
-        public Builder setQueue(SongQueue queue) {
+        public SongPlayer.Builder setQueue(SongQueue queue) {
             this.queue = queue;
             return this;
         }
 
-        public Builder queue(Song song) {
+        public SongPlayer.Builder queue(Song song) {
             this.queue.queueSong(song);
             return this;
         }
 
-        public Builder queue(Playlist playlist) {
+        public SongPlayer.Builder queue(Playlist playlist) {
             this.queue.queuePlaylist(playlist);
             return this;
         }
 
-        public Builder soundCategory(SoundCategory soundCategory) {
+        public SongPlayer.Builder soundCategory(SoundCategory soundCategory) {
             this.soundCategory = soundCategory;
             return this;
         }
 
-        public Builder volume(int volume) {
+        public SongPlayer.Builder volume(int volume) {
             this.volume = volume;
             return this;
         }
 
-        public Builder transposeNotes(boolean transposeNotes) {
+        public SongPlayer.Builder transposeNotes(boolean transposeNotes) {
             this.transposeNotes = transposeNotes;
             return this;
         }

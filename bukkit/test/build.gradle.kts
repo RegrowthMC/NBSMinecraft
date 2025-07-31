@@ -5,14 +5,13 @@ plugins {
 dependencies {
     // Dependencies
     compileOnly("org.spigotmc:spigot-api:1.21.8-R0.1-SNAPSHOT")
-    testCompileOnly("org.spigotmc:spigot-api:1.21.8-R0.1-SNAPSHOT")
 
     // Projects
-    api(project(":api"))
+    api(project(":bukkit"))
 
     // Libraries
-    testImplementation("io.github.revxrsal:lamp.common:4.0.0-rc.12")
-    testImplementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.12")
+    implementation("io.github.revxrsal:lamp.common:4.0.0-rc.12")
+    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.12")
 }
 
 tasks {

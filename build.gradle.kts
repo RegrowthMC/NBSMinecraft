@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.lushplugins"
-version = "1.0.0-alpha38"
+version = "1.0.0-alpha39"
 
 allprojects {
     apply(plugin="java-library")
@@ -17,7 +17,7 @@ allprojects {
         }
 
         shadowJar {
-            relocate("cz.koca2000.nbs4j", "org.lushplugins.nbsminecraft.libs.nbs4j")
+            relocate("net.raphimc.noteblocklib", "org.lushplugins.nbsminecraft.libs.noteblocklib")
         }
     }
 }
@@ -33,13 +33,14 @@ subprojects {
         mavenCentral()
         mavenLocal()
         maven("https://oss.sonatype.org/content/groups/public/")
+        maven("https://maven.lenni0451.net/snapshots/") // NoteblockLib
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
         maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
         maven("https://maven.neoforged.net/releases") // NeoForge
         maven("https://repo.opencollab.dev/maven-releases/") // Allay
         maven("https://repo.opencollab.dev/maven-snapshots/") // Allay
         maven("https://storehouse.okaeri.eu/repository/maven-public/") // Allay
-        maven("https://jitpack.io/") // NBS4j, Allay
+        maven("https://jitpack.io/") // Allay
     }
 
     dependencies {

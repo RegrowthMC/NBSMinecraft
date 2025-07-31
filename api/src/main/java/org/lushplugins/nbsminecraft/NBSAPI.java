@@ -1,7 +1,8 @@
 package org.lushplugins.nbsminecraft;
 
-import cz.koca2000.nbs4j.Song;
-import cz.koca2000.nbs4j.SongCorruptedException;
+import net.raphimc.noteblocklib.NoteBlockLib;
+import net.raphimc.noteblocklib.format.SongFormat;
+import net.raphimc.noteblocklib.model.Song;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +37,9 @@ public class NBSAPI {
      */
     public Song readSongFile(File file) {
         try {
-            return Song.fromFile(file);
-        } catch (IOException | SongCorruptedException e) {
-            LOGGER.log(Level.WARNING, String.format("Failed to read song '%s': ", file.getName()), e);
+            return NoteBlockLib.readSong(file);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to read song '%s': ".formatted(file.getName()), e);
             return null;
         }
     }
@@ -49,7 +50,12 @@ public class NBSAPI {
      * @return parsed song
      */
     public Song readSongInputStream(InputStream inputStream) {
-        return Song.fromStream(inputStream);
+        try {
+            return NoteBlockLib.readSong(inputStream, SongFormat.NBS);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to read song from input stream: ", e);
+            return null;
+        }
     }
 
     /**

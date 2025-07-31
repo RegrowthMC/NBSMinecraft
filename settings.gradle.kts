@@ -4,6 +4,7 @@ include("api")
 
 include("allay")
 include("bukkit")
+include("bukkit:test")
 include("fabric")
 include("neoforge")
 include("packetevents")
