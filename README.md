@@ -97,7 +97,7 @@ player.play();
 ```
 
 ### Getting a Song instance
-There are multiple methods in the NBTAPI class that you can use to parse `.nbs` files; `readSongFile(File)`, `readSongInputStream(InputStream)` and `Map<String, Song> readSongsInDirectory(File)`.
+There are multiple methods in the NBSAPI class that you can use to parse `.nbs` files; `readSongFile(File)`, `readSongInputStream(InputStream)` and `Map<String, Song> readSongsInDirectory(File)`.
 
 
 <br>
