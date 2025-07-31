@@ -33,7 +33,7 @@ public class SongPlayer {
     private final boolean transposeNotes;
 
     private Song song = null;
-    private boolean playing = true;
+    private boolean playing = false;
     private int songTick = 0;
     private long songStartTime = -1;
 
@@ -236,7 +236,7 @@ public class SongPlayer {
             NBSAPI.INSTANCE.getThreadPool().schedule(this::tickSong, period, TimeUnit.MILLISECONDS);
 
             if (!this.listeners.isEmpty() && this.volume > 0) {
-                for (Note note : this.song.getNotes().get(this.songTick)) {
+                for (Note note : this.song.getNotes().getOrEmpty(this.songTick)) {
                     if (note == null) {
                         continue;
                     }
@@ -258,7 +258,8 @@ public class SongPlayer {
                         throw new IllegalStateException("Invalid instrument found");
                     }
 
-                    float volume = (this.volume * note.getVolume()) / 1_000_000F;
+                    float volume = ((this.volume / 100F) * note.getVolume());
+//                    float volume = (this.volume * note.getVolume()) / 1_000_000F;
                     float pitch = note.getPitch();
 
                     for (AudioListener listener : this.listeners.values()) {
