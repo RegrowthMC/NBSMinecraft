@@ -17,7 +17,7 @@ allprojects {
         }
 
         shadowJar {
-            relocate("cz.koca2000.nbs4j", "org.lushplugins.nbsminecraft.libs.nbs4j")
+            relocate("net.raphimc.noteblocklib", "org.lushplugins.nbsminecraft.libs.noteblocklib")
         }
     }
 }
@@ -39,7 +39,7 @@ subprojects {
         maven("https://repo.opencollab.dev/maven-releases/") // Allay
         maven("https://repo.opencollab.dev/maven-snapshots/") // Allay
         maven("https://storehouse.okaeri.eu/repository/maven-public/") // Allay
-        maven("https://jitpack.io/") // NBS4j, Allay
+        maven("https://jitpack.io/") // Allay
     }
 
     dependencies {
