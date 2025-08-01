@@ -21,15 +21,6 @@ public class NBSAPI {
     public static final NBSAPI INSTANCE = new NBSAPI();
     private static final Logger LOGGER = Logger.getLogger("NBSMinecraft");
 
-    private final ScheduledExecutorService threads = Executors.newScheduledThreadPool(1);
-
-    /**
-     * @return the thread pool used to send sounds to players
-     */
-    public ScheduledExecutorService getThreadPool() {
-        return threads;
-    }
-
     /**
      * Read a song from a file
      * @param file file to read
