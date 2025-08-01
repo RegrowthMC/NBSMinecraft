@@ -271,10 +271,6 @@ public class SongPlayer {
         @Override
         protected void playNotes(List<Note> notes) {
             for (Note note : notes) {
-                if (note == null) {
-                    continue;
-                }
-
                 try {
                     playNote(note);
                 } catch (Throwable e) {
