@@ -241,28 +241,19 @@ public class SongPlayer {
         }
 
         protected void playNote(Note note) {
-            // TODO: Move note shifting into NBSAPI class and modify notes when reading song
-            if (transposeNotes) {
-                MinecraftDefinitions.instrumentShiftNote(note);
-                MinecraftDefinitions.transposeNoteKey(note);
-            } else {
-                MinecraftDefinitions.applyExtendedNotesResourcePack(note);
-            }
-
             String sound;
             if (note.getInstrument() instanceof NbsCustomInstrument instrument) {
-                sound = instrument.getName();
+                sound = instrument.getName().toLowerCase();
             } else if (note.getInstrument() instanceof MinecraftInstrument instrument) {
                 sound = instrument.mcSoundName();
             } else {
-                NBSAPI.INSTANCE.log(Level.WARNING, "Invalid instrument type found: " + note.getInstrument().getClass().getName());
+                NBSAPI.log(Level.WARNING, "Invalid instrument type found: " + note.getInstrument().getClass().getName());
                 return;
             }
 
             float volume = ((SongPlayer.this.volume / 100F) * note.getVolume());
             float pitch = note.getPitch();
 
-            sound = sound.toLowerCase();
             for (AudioListener listener : listeners.values()) {
                 soundEmitter.playSound(platform, listener, sound, soundCategory, volume, pitch);
             }
@@ -276,12 +267,11 @@ public class SongPlayer {
                 } catch (Throwable e) {
                     String exceptionClassName = e.getClass().getSimpleName();
                     if (exceptionClassName.equals("ResourceLocationException")) {
-                        NBSAPI.INSTANCE.log(Level.WARNING, "Invalid instrument: " + e.getMessage());
+                        NBSAPI.log(Level.WARNING, "Invalid instrument: " + e.getMessage());
                         return;
                     }
 
-                    // TODO: Shrink invalid instrument exceptions to 1 line (or parse and remove invalid instruments on song queue)
-                    e.printStackTrace();
+                    NBSAPI.log(Level.WARNING, "Failed to play note: ", e);
                 }
             }
         }

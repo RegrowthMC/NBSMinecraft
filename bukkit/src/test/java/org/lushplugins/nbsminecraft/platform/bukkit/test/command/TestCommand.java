@@ -16,7 +16,7 @@ public class TestCommand {
     @Command("nbstest")
     public void nbstest(String songName) {
         songName = songName.contains(".nbs") ? songName : songName + ".nbs";
-        Song song = NBSAPI.INSTANCE.readSongInputStream(this.plugin.getResource("songs/" + songName));
+        Song song = NBSAPI.readSongInputStream(this.plugin.getResource("songs/" + songName));
         this.plugin.getSongPlayer().queueSong(song);
     }
 }
