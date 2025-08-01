@@ -3,6 +3,7 @@ package org.lushplugins.nbsminecraft.utils;
 import net.raphimc.noteblocklib.data.MinecraftInstrument;
 import net.raphimc.noteblocklib.model.instrument.Instrument;
 
+// TODO: Implement
 public class ExtendedMinecraftInstrument implements Instrument {
 
     private final MinecraftInstrument minecraftInstrument;
