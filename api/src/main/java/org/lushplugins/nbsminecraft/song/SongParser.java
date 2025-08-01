@@ -15,8 +15,10 @@ public interface SongParser {
     });
     SongParser EXTENDED_NOTES_RESOURCE_PACK = (song) -> song.getNotes().forEach((note) -> {
         if (note.getInstrument() instanceof MinecraftInstrument instrument) {
-            final int octaveShift = MinecraftDefinitions.applyExtendedNotesResourcePack(note);
-            note.setInstrument(new ExtendedMinecraftInstrument(instrument, octaveShift));
+            int octaveShift = MinecraftDefinitions.applyExtendedNotesResourcePack(note);
+            if (octaveShift != 0) {
+                note.setInstrument(new ExtendedMinecraftInstrument(instrument, octaveShift));
+            }
         } else {
             DEFAULT.parse(song);
         }
