@@ -10,8 +10,8 @@ dependencies {
     api(project(":bukkit"))
 
     // Libraries
-    implementation("io.github.revxrsal:lamp.common:4.0.0-rc.12")
-    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.12")
+    implementation("io.github.revxrsal:lamp.common:4.0.0-rc.13")
+    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.13")
 }
 
 tasks {
