@@ -1,3 +1,5 @@
+![This project proudly suppports the LGBTQIA+ community](https://raw.githubusercontent.com/OakLoaf/OakLoaf/refs/heads/main/assets/pride.png)
+
 # NBSMinecraft
 NBSMinecraft is an easy to use, asynchronous API for playing `.nbs` music files. This library was made with the intention of offering a lightweight, platformless API to allow the use of note block music on as many Minecraft platforms as possible.
 
