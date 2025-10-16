@@ -1,6 +1,6 @@
 dependencies {
     // Dependencies
-    compileOnly("org.allaymc.allay:api:0.6.0")
+    compileOnly("org.allaymc.allay:api:0.14.0")
 
     // Projects
     api(project(":api"))
