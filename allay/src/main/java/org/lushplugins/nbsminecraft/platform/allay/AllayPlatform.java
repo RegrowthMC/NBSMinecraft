@@ -7,8 +7,7 @@ import org.allaymc.api.entity.interfaces.EntityPlayer;
 import org.allaymc.api.server.Server;
 import org.allaymc.api.world.Dimension;
 import org.allaymc.api.world.World;
-import org.cloudburstmc.math.vector.Vector3f;
-import org.cloudburstmc.protocol.bedrock.packet.PlaySoundPacket;
+import org.allaymc.api.world.sound.CustomSound;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3dc;
 import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
@@ -35,10 +34,7 @@ public class AllayPlatform extends AbstractPlatform {
             return;
         }
 
-        Vector3dc vector = player.getLocation();
-        Vector3f position = Vector3f.from(vector.x(), vector.y(), vector.z());
-
-        playSound(player, position, sound, volume, pitch);
+        playSound(player, player.getLocation(), sound, volume, pitch);
     }
 
     @Override
@@ -53,10 +49,7 @@ public class AllayPlatform extends AbstractPlatform {
             return;
         }
 
-        Vector3dc vector = player.getLocation();
-        Vector3f position = Vector3f.from(vector.x(), vector.y(), vector.z());
-
-        playSound(player, position, sound, volume, pitch);
+        playSound(player, player.getLocation(), sound, volume, pitch);
     }
 
     @Override
@@ -66,25 +59,17 @@ public class AllayPlatform extends AbstractPlatform {
             return;
         }
 
-        Vector3f position = AllayConverter.convert(location);
-
-        playSound(player, position, sound, volume, pitch);
+        playSound(player, AllayConverter.convert(location), sound, volume, pitch);
     }
 
-    private void playSound(EntityPlayer listener, Vector3f position, String sound, float volume, float pitch) {
-        PlaySoundPacket packet = new PlaySoundPacket();
-        packet.setSound(sound);
-        packet.setVolume(volume);
-        packet.setPitch(pitch);
-        packet.setPosition(position);
-
-        listener.sendPacket(packet);
+    private void playSound(EntityPlayer listener, Vector3dc position, String sound, float volume, float pitch) {
+        listener.viewSound(new CustomSound(sound, volume, pitch), position, true);
     }
 
     private @Nullable EntityPlayer findPlayer(EntityReference entityReference) {
         Entity entity = entityCache.getIfPresent(entityReference.uuid());
         if (!(entity instanceof EntityPlayer player) || player.isDisconnected()) {
-            EntityPlayer player = Server.getInstance().getPlayerService().getPlayers().get(entityReference.uuid());
+            EntityPlayer player = Server.getInstance().getPlayerManager().getPlayers().get(entityReference.uuid());
             if (player != null) {
                 entityCache.put(entityReference.uuid(), player);
             }
@@ -110,7 +95,7 @@ public class AllayPlatform extends AbstractPlatform {
     private Entity getEntity(int entityId) {
         for (World world : Server.getInstance().getWorldPool().getWorlds().values()) {
             for (Dimension dimension : world.getDimensions().values()) {
-                return dimension.getEntityService().getEntity(entityId);
+                return dimension.getEntityManager().getEntity(entityId);
             }
         }
 

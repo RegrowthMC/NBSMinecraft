@@ -36,11 +36,8 @@ subprojects {
         maven("https://maven.lenni0451.net/snapshots/") // NoteblockLib
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
         maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
+        maven("https://jitpack.io/") // PacketEvents
         maven("https://maven.neoforged.net/releases") // NeoForge
-        maven("https://repo.opencollab.dev/maven-releases/") // Allay
-        maven("https://repo.opencollab.dev/maven-snapshots/") // Allay
-        maven("https://storehouse.okaeri.eu/repository/maven-public/") // Allay
-        maven("https://jitpack.io/") // Allay
     }
 
     dependencies {

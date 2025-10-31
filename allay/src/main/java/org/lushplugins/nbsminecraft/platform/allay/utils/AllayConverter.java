@@ -1,11 +1,11 @@
 package org.lushplugins.nbsminecraft.platform.allay.utils;
 
-import org.cloudburstmc.math.vector.Vector3f;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.lushplugins.nbsminecraft.utils.SoundLocation;
 
 public class AllayConverter {
-
-    public static Vector3f convert(SoundLocation location) {
-        return Vector3f.from(location.x(), location.y(), location.z());
+    public static Vector3dc convert(SoundLocation location) {
+        return new Vector3d(location.x(), location.y(), location.z());
     }
 }
