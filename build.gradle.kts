@@ -36,8 +36,8 @@ subprojects {
         maven("https://maven.lenni0451.net/snapshots/") // NoteblockLib
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
         maven("https://repo.codemc.io/repository/maven-releases/") // PacketEvents
-        maven("https://jitpack.io/") // PacketEvents
         maven("https://maven.neoforged.net/releases") // NeoForge
+        maven("https://jitpack.io/") // PacketEvents
     }
 
     dependencies {
