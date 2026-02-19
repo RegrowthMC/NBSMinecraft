@@ -71,7 +71,7 @@ repositories {
 **Artifact:**
 ```gradle
 dependencies {
-    compileOnly "org.lushplugins.nbsminecraft:NBSMinecraft-{platform}:1.0.0"
+    implementation "org.lushplugins.nbsminecraft:NBSMinecraft-{platform}:1.0.0"
 }
 ```
 </details>
