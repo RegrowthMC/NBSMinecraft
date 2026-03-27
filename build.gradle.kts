@@ -42,7 +42,7 @@ subprojects {
 
     dependencies {
         // Annotations
-        compileOnlyApi("org.jetbrains:annotations:26.0.2-1")
+        compileOnlyApi("org.jetbrains:annotations:26.1.0")
     }
 
     java {
