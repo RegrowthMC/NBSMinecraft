@@ -1,13 +1,13 @@
 plugins {
-    id("fabric-loom") version("1.11-SNAPSHOT")
+    id("fabric-loom") version("1.15-SNAPSHOT")
 }
 
 dependencies {
     // Dependencies
-    minecraft("com.mojang:minecraft:1.21.8")
-    mappings("net.fabricmc:yarn:1.21.8+build.1:v2")
-    modCompileOnly("net.fabricmc:fabric-loader:0.16.14")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.129.0+1.21.8")
+    minecraft("com.mojang:minecraft:1.21.11")
+    mappings("net.fabricmc:yarn:1.21.11+build.4")
+    modCompileOnly("net.fabricmc:fabric-loader:0.18.5")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.141.3+1.21.11")
 
     // Projects
     api(project(":api"))
