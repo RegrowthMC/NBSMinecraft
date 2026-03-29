@@ -1,9 +1,8 @@
 package org.lushplugins.nbsminecraft.song;
 
-import net.raphimc.noteblocklib.data.MinecraftDefinitions;
-import net.raphimc.noteblocklib.data.MinecraftInstrument;
-import net.raphimc.noteblocklib.model.Song;
-import org.lushplugins.nbsminecraft.utils.ExtendedMinecraftInstrument;
+import net.raphimc.noteblocklib.format.minecraft.MinecraftDefinitions;
+import net.raphimc.noteblocklib.format.minecraft.MinecraftInstrument;
+import net.raphimc.noteblocklib.model.song.Song;
 
 @FunctionalInterface
 public interface SongParser {
@@ -14,11 +13,8 @@ public interface SongParser {
         MinecraftDefinitions.transposeNoteKey(note);
     });
     SongParser EXTENDED_NOTES_RESOURCE_PACK = (song) -> song.getNotes().forEach((note) -> {
-        if (note.getInstrument() instanceof MinecraftInstrument instrument) {
-            int octaveShift = MinecraftDefinitions.applyExtendedNotesResourcePack(note);
-            if (octaveShift != 0) {
-                note.setInstrument(new ExtendedMinecraftInstrument(instrument, octaveShift));
-            }
+        if (note.getInstrument() instanceof MinecraftInstrument) {
+            MinecraftDefinitions.applyExtendedNotesResourcePack(note);
         } else {
             DEFAULT.parse(song);
         }

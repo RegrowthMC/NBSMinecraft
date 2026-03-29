@@ -1,6 +1,6 @@
 package org.lushplugins.nbsminecraft.song;
 
-import net.raphimc.noteblocklib.model.Song;
+import net.raphimc.noteblocklib.model.song.Song;
 
 import java.util.*;
 

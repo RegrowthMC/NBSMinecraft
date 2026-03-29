@@ -1,9 +1,10 @@
 package org.lushplugins.nbsminecraft.player;
 
-import net.raphimc.noteblocklib.data.MinecraftInstrument;
+import net.raphimc.noteblocklib.format.minecraft.MinecraftInstrument;
+import net.raphimc.noteblocklib.format.minecraft.ShiftedMinecraftInstrument;
 import net.raphimc.noteblocklib.format.nbs.model.NbsCustomInstrument;
-import net.raphimc.noteblocklib.model.Note;
-import net.raphimc.noteblocklib.model.Song;
+import net.raphimc.noteblocklib.model.note.Note;
+import net.raphimc.noteblocklib.model.song.Song;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.nbsminecraft.NBSAPI;
 import org.lushplugins.nbsminecraft.platform.AbstractPlatform;
@@ -12,7 +13,6 @@ import org.lushplugins.nbsminecraft.player.emitter.SoundEmitter;
 import org.lushplugins.nbsminecraft.song.Playlist;
 import org.lushplugins.nbsminecraft.song.SongQueue;
 import org.lushplugins.nbsminecraft.utils.AudioListener;
-import org.lushplugins.nbsminecraft.utils.ExtendedMinecraftInstrument;
 import org.lushplugins.nbsminecraft.utils.SoundCategory;
 
 import java.time.Instant;
@@ -246,8 +246,8 @@ public class SongPlayer {
                 sound = instrument.getName().toLowerCase();
             } else if (note.getInstrument() instanceof MinecraftInstrument instrument) {
                 sound = instrument.mcSoundName();
-            } else if (note.getInstrument() instanceof ExtendedMinecraftInstrument instrument) {
-                sound = instrument.soundName();
+            } else if (note.getInstrument() instanceof ShiftedMinecraftInstrument instrument) {
+                sound = instrument.mcSoundName();
             } else {
                 NBSAPI.log(Level.WARNING, "Invalid instrument type found: " + note.getInstrument().getClass().getName());
                 return;
