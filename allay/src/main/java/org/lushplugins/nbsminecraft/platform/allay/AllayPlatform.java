@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.allaymc.api.entity.Entity;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
+import org.allaymc.api.player.Player;
 import org.allaymc.api.server.Server;
 import org.allaymc.api.world.Dimension;
 import org.allaymc.api.world.World;
@@ -29,17 +30,22 @@ public class AllayPlatform extends AbstractPlatform {
 
     @Override
     public void playSound(AudioListener listener, String sound, SoundCategory category, float volume, float pitch) {
-        EntityPlayer player = findPlayer(listener);
+        Player player = findPlayer(listener);
         if (player == null) {
             return;
         }
 
-        playSound(player, player.getLocation(), sound, volume, pitch);
+        EntityPlayer entity = player.getControlledEntity();
+        if (entity == null) {
+            return;
+        }
+
+        playSound(player, entity.getLocation(), sound, volume, pitch);
     }
 
     @Override
     public void playSound(AudioListener listener, EntityReference entityReference, String sound, SoundCategory category, float volume, float pitch) {
-        EntityPlayer player = findPlayer(listener);
+        Player player = findPlayer(listener);
         if (player == null) {
             return;
         }
@@ -49,12 +55,12 @@ public class AllayPlatform extends AbstractPlatform {
             return;
         }
 
-        playSound(player, player.getLocation(), sound, volume, pitch);
+        playSound(player, entity.getLocation(), sound, volume, pitch);
     }
 
     @Override
     public void playSound(AudioListener listener, SoundLocation location, String sound, SoundCategory category, float volume, float pitch) {
-        EntityPlayer player = findPlayer(listener);
+        Player player = findPlayer(listener);
         if (player == null) {
             return;
         }
@@ -62,22 +68,25 @@ public class AllayPlatform extends AbstractPlatform {
         playSound(player, AllayConverter.convert(location), sound, volume, pitch);
     }
 
-    private void playSound(EntityPlayer listener, Vector3dc position, String sound, float volume, float pitch) {
+    private void playSound(Player listener, Vector3dc position, String sound, float volume, float pitch) {
         listener.viewSound(new CustomSound(sound, volume, pitch), position, true);
     }
 
-    private @Nullable EntityPlayer findPlayer(EntityReference entityReference) {
+    private @Nullable Player findPlayer(EntityReference entityReference) {
         Entity entity = entityCache.getIfPresent(entityReference.uuid());
-        if (!(entity instanceof EntityPlayer player) || player.isDisconnected()) {
-            EntityPlayer player = Server.getInstance().getPlayerManager().getPlayers().get(entityReference.uuid());
-            if (player != null) {
-                entityCache.put(entityReference.uuid(), player);
+        if (entity instanceof EntityPlayer playerEntity) {
+            Player player = playerEntity.getController();
+            if (player != null && player.isConnected()) {
+                return player;
             }
-
-            return player;
-        } else {
-            return player;
         }
+
+        Player player = Server.getInstance().getPlayerManager().getPlayers().get(entityReference.uuid());
+        if (player != null) {
+            entityCache.put(entityReference.uuid(), player.getControlledEntity());
+        }
+
+        return player;
     }
 
     private @Nullable Entity findEntity(EntityReference entityReference) {
