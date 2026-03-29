@@ -1,6 +1,6 @@
 package org.lushplugins.nbsminecraft.platform.bukkit.test.command;
 
-import net.raphimc.noteblocklib.model.Song;
+import net.raphimc.noteblocklib.model.song.Song;
 import org.lushplugins.nbsminecraft.NBSAPI;
 import org.lushplugins.nbsminecraft.platform.bukkit.test.TestPlugin;
 import revxrsal.commands.annotation.Command;

@@ -1,14 +1,14 @@
 package org.lushplugins.nbsminecraft;
 
 import net.raphimc.noteblocklib.NoteBlockLib;
-import net.raphimc.noteblocklib.data.MinecraftInstrument;
+import net.raphimc.noteblocklib.format.minecraft.MinecraftInstrument;
 import net.raphimc.noteblocklib.format.SongFormat;
+import net.raphimc.noteblocklib.format.minecraft.ShiftedMinecraftInstrument;
 import net.raphimc.noteblocklib.format.nbs.model.NbsCustomInstrument;
-import net.raphimc.noteblocklib.model.Song;
-import net.raphimc.noteblocklib.model.instrument.Instrument;
+import net.raphimc.noteblocklib.model.note.Instrument;
+import net.raphimc.noteblocklib.model.song.Song;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.nbsminecraft.song.SongParser;
-import org.lushplugins.nbsminecraft.utils.ExtendedMinecraftInstrument;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +98,7 @@ public class NBSAPI {
 
         song.getNotes().removeIf(note -> {
             Instrument instrument = note.getInstrument();
-            if (!(instrument instanceof MinecraftInstrument) && !(instrument instanceof NbsCustomInstrument) && !(instrument instanceof ExtendedMinecraftInstrument)) {
+            if (!(instrument instanceof MinecraftInstrument) && !(instrument instanceof NbsCustomInstrument) && !(instrument instanceof ShiftedMinecraftInstrument)) {
                 invalidInstrumentTypes.add(note.getInstrument().getClass().getName());
                 return true;
             }
