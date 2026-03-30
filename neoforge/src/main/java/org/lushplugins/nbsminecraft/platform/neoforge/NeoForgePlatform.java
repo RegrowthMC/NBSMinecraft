@@ -7,8 +7,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -64,7 +64,7 @@ public class NeoForgePlatform extends AbstractPlatform {
     private void playSound(ServerPlayer player, Entity entity, String sound, org.lushplugins.nbsminecraft.utils.SoundCategory category, float volume, float pitch) {
         SoundSource soundSource = NeoForgeConverter.convert(category);
 
-        Holder.Reference<SoundEvent> soundEvent = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(sound)).orElse(null);
+        Holder.Reference<SoundEvent> soundEvent = BuiltInRegistries.SOUND_EVENT.get(Identifier.parse(sound)).orElse(null);
         if (soundEvent == null) {
             return;
         }
@@ -81,7 +81,7 @@ public class NeoForgePlatform extends AbstractPlatform {
 
     @Override
     public void playSound(AudioListener listener, SoundLocation location, String sound, org.lushplugins.nbsminecraft.utils.SoundCategory category, float volume, float pitch) {
-        ServerLevel world = this.server.getLevel(ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(location.world())));
+        ServerLevel world = this.server.getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(location.world())));
         if (world == null) {
             return;
         }
@@ -91,7 +91,7 @@ public class NeoForgePlatform extends AbstractPlatform {
             return;
         }
 
-        Holder.Reference<SoundEvent> soundEvent = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(sound)).orElse(null);
+        Holder.Reference<SoundEvent> soundEvent = BuiltInRegistries.SOUND_EVENT.get(Identifier.parse(sound)).orElse(null);
         if (soundEvent == null) {
             return;
         }
