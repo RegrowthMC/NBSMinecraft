@@ -1,6 +1,6 @@
 dependencies {
     // Dependencies
-    compileOnly("com.github.retrooper:packetevents-api:2.12.1")
+    compileOnly("com.github.retrooper:packetevents-api:2.12.2")
     compileOnly("net.kyori:adventure-api:4.26.1")
 
     // Libraries
