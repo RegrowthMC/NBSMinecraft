@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     // Dependencies
-    compileOnly("net.neoforged:neoforge:21.11.42")
+    compileOnly("net.neoforged:neoforge:26.1.2.74")
 
     // Projects
     api(project(":api"))
