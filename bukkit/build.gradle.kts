@@ -11,8 +11,8 @@ dependencies {
     api(project(":api"))
 
     // Libraries
-    testImplementation("io.github.revxrsal:lamp.common:4.0.0-rc.16")
-    testImplementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.16")
+    testImplementation("io.github.revxrsal:lamp.common:4.0.0-rc.17")
+    testImplementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.17")
 }
 
 tasks {
