@@ -14,7 +14,7 @@ dependencies {
 
     // Dependencies to include in jar
     include(project(":api"))
-    include("net.raphimc:NoteBlockLib:3.2.1")
+    include("net.raphimc:NoteBlockLib:3.3.0")
 }
 
 java {
